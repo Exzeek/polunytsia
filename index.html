@@ -1,0 +1,711 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Полуниця">
+<title>🍓 Облік полуниці</title>
+<style>
+:root{
+  --G:#1a8a4a;--GL:#e8f5ee;--GD:#136636;
+  --A:#c47a00;--AL:#fff8e1;
+  --R:#c0392b;--RL:#fdecea;
+  --B:#1565c0;--BL:#e3f0fd;
+  --GR:#6b7280;--GRL:#f3f4f6;
+  --BD:#9ca3af;--TX:#111827;--TX2:#374151;--W:#ffffff;
+  --RAD:12px;--RADS:8px;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:rgba(0,0,0,.08);}
+html{height:100%;-webkit-text-size-adjust:100%;}
+body{
+  font-family:-apple-system,BlinkMacSystemFont,'Helvetica Neue',sans-serif;
+  background:#e5e7eb;color:var(--TX);
+  min-height:100%;padding-bottom:80px;
+  -webkit-font-smoothing:antialiased;
+}
+
+/* HEADER */
+.hdr{
+  background:var(--G);color:#fff;
+  padding:14px 14px 12px;
+  display:flex;align-items:center;justify-content:space-between;
+  position:sticky;top:0;z-index:50;
+}
+.hdr-t{font-size:17px;font-weight:700;}
+.hdr-s{font-size:11px;opacity:.8;margin-top:2px;}
+.spill{
+  background:rgba(0,0,0,.22);border-radius:20px;
+  padding:6px 11px;font-size:11px;font-weight:600;
+  display:flex;align-items:center;gap:5px;cursor:pointer;
+  -webkit-user-select:none;user-select:none;
+}
+.sdot{width:8px;height:8px;border-radius:50%;background:#fbbf24;flex-shrink:0;}
+.sdot.ok{background:#4ade80;}
+.sdot.busy{background:#93c5fd;animation:bl 1s infinite;}
+@keyframes bl{0%,100%{opacity:1}50%{opacity:.3}}
+
+/* TABS */
+.tabs{
+  position:fixed;bottom:0;left:0;right:0;
+  background:#fff;border-top:2px solid var(--BD);
+  display:flex;z-index:100;
+  padding-bottom:env(safe-area-inset-bottom,0);
+}
+.tbtn{
+  flex:1;border:none;background:none;
+  padding:9px 2px 7px;
+  display:flex;flex-direction:column;align-items:center;gap:3px;
+  font-size:10px;font-weight:700;color:#9ca3af;cursor:pointer;
+  -webkit-user-select:none;user-select:none;
+}
+.tbtn svg{width:23px;height:23px;stroke:#9ca3af;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
+.tbtn.on{color:var(--G);}
+.tbtn.on svg{stroke:var(--G);}
+
+/* PAGES */
+.pg{display:none;padding:10px;}
+.pg.on{display:block;}
+
+/* CARD */
+.card{background:#fff;border-radius:var(--RAD);border:2px solid var(--BD);padding:15px;margin-bottom:10px;}
+.ctit{font-size:11px;font-weight:700;color:var(--GR);text-transform:uppercase;letter-spacing:.7px;margin-bottom:12px;}
+
+/* INPUTS */
+.inp{
+  width:100%;padding:14px;font-size:16px;
+  border:2px solid var(--BD);border-radius:var(--RADS);
+  background:#fff;color:var(--TX);outline:none;
+  -webkit-appearance:none;appearance:none;
+}
+.inp:focus{border-color:var(--G);}
+label{display:block;font-size:13px;font-weight:700;color:var(--TX2);margin-bottom:6px;}
+
+/* QTY */
+.qrow{display:flex;align-items:stretch;gap:8px;}
+.qpm{
+  width:60px;height:60px;flex-shrink:0;
+  border:2px solid var(--BD);border-radius:var(--RADS);
+  background:var(--GRL);color:var(--TX);
+  font-size:30px;font-weight:300;
+  display:flex;align-items:center;justify-content:center;
+  cursor:pointer;-webkit-user-select:none;user-select:none;
+  touch-action:manipulation;
+}
+.qpm:active{background:#d1d5db;}
+.qnum{
+  flex:1;display:flex;align-items:center;justify-content:center;
+  font-size:32px;font-weight:900;color:var(--TX);
+  background:var(--GRL);border:2px solid var(--BD);border-radius:var(--RADS);
+  min-height:60px;letter-spacing:-1px;
+}
+.presets{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;margin-top:9px;}
+.pre{
+  padding:11px 4px;border:2px solid var(--BD);border-radius:var(--RADS);
+  background:#fff;color:var(--TX2);font-size:14px;font-weight:800;
+  text-align:center;cursor:pointer;touch-action:manipulation;
+}
+.pre:active{background:var(--GRL);}
+
+/* QUALITY */
+.qgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;}
+.qopt{
+  padding:15px 6px;
+  border:2.5px solid var(--BD);border-radius:var(--RADS);
+  background:#fff;text-align:center;cursor:pointer;
+  touch-action:manipulation;-webkit-user-select:none;user-select:none;
+}
+.qopt:active{transform:scale(.96);}
+.ico{font-size:26px;display:block;margin-bottom:5px;}
+.qlb{font-size:12px;font-weight:700;color:var(--TX2);line-height:1.3;}
+.qopt.s1{border-color:var(--G);background:var(--GL);}
+.qopt.s1 .qlb{color:var(--GD);}
+.qopt.s2{border-color:var(--A);background:var(--AL);}
+.qopt.s2 .qlb{color:var(--A);}
+.qopt.s3{border-color:var(--R);background:var(--RL);}
+.qopt.s3 .qlb{color:var(--R);}
+
+/* TIMEBOX */
+.tbox{
+  background:var(--GRL);border:2px solid var(--BD);border-radius:var(--RADS);
+  padding:13px 14px;display:flex;justify-content:space-between;align-items:center;
+}
+.ttime{font-size:24px;font-weight:900;color:var(--TX);}
+.tdate{font-size:13px;color:var(--TX2);margin-top:2px;}
+.tauto{font-size:10px;font-weight:700;background:#fff;border:1.5px solid var(--BD);border-radius:20px;padding:4px 10px;color:var(--GR);}
+
+/* SUBMIT */
+.bgo{
+  width:100%;padding:18px;
+  background:var(--G);color:#fff;border:none;
+  border-radius:var(--RAD);font-size:18px;font-weight:900;
+  cursor:pointer;touch-action:manipulation;letter-spacing:.3px;
+  margin-top:2px;
+}
+.bgo:active{background:var(--GD);}
+
+/* JOURNAL FILTERS */
+.frow{display:flex;gap:7px;margin-bottom:10px;flex-wrap:wrap;align-items:center;}
+.chip{
+  padding:8px 15px;border:2px solid var(--BD);border-radius:20px;
+  font-size:13px;font-weight:700;cursor:pointer;
+  background:#fff;color:var(--TX2);touch-action:manipulation;
+}
+.chip.on{border-color:var(--G);background:var(--GL);color:var(--GD);}
+.chip:active{opacity:.7;}
+
+/* STAT BOXES */
+.s2{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px;}
+.sbox{background:#fff;border:2px solid var(--BD);border-radius:var(--RADS);padding:13px;}
+.slb{font-size:10px;font-weight:700;color:var(--GR);text-transform:uppercase;letter-spacing:.5px;}
+.svl{font-size:26px;font-weight:900;color:var(--TX);margin-top:2px;}
+.ssb{font-size:11px;color:var(--TX2);margin-top:1px;}
+
+/* TABLE */
+.tscr{overflow-x:auto;border:2px solid var(--BD);border-radius:var(--RADS);background:#fff;}
+table{width:100%;border-collapse:collapse;font-size:13px;min-width:320px;}
+thead th{
+  background:var(--GRL);padding:9px 8px;text-align:left;
+  font-size:11px;font-weight:700;color:var(--GR);
+  text-transform:uppercase;letter-spacing:.4px;
+  border-bottom:2px solid var(--BD);white-space:nowrap;
+}
+tbody td{padding:10px 8px;border-bottom:1px solid #e5e7eb;color:var(--TX);vertical-align:middle;}
+tbody tr:last-child td{border-bottom:none;}
+
+.badge{display:inline-block;padding:3px 9px;border-radius:20px;font-size:11px;font-weight:700;border:1.5px solid;white-space:nowrap;}
+.bg{background:var(--GL);color:var(--GD);border-color:#6ee7b7;}
+.ba{background:var(--AL);color:var(--A);border-color:#fcd34d;}
+.br{background:var(--RL);color:var(--R);border-color:#fca5a5;}
+.bb{background:var(--BL);color:var(--B);border-color:#93c5fd;}
+.bgr{background:var(--GRL);color:var(--GR);border-color:var(--BD);}
+
+.dbtn{
+  border:2px solid var(--BD);border-radius:6px;
+  background:#fff;color:var(--GR);padding:5px 9px;
+  font-size:13px;cursor:pointer;touch-action:manipulation;
+}
+.dbtn:active{background:var(--RL);border-color:var(--R);color:var(--R);}
+.empty{text-align:center;padding:32px;color:var(--GR);font-size:14px;}
+
+/* STATS BARS */
+.qbar{margin-bottom:13px;}
+.qbar-h{display:flex;justify-content:space-between;font-size:13px;margin-bottom:5px;}
+.qbar-bg{height:11px;background:#e5e7eb;border-radius:5px;overflow:hidden;border:1px solid #d1d5db;}
+.qbar-f{height:100%;border-radius:5px;}
+
+/* WORKERS */
+.wrow{display:flex;align-items:center;padding:11px 0;border-bottom:1px solid #e5e7eb;gap:10px;}
+.wrow:last-child{border-bottom:none;}
+.wini{
+  width:40px;height:40px;border-radius:50%;
+  background:var(--GL);color:var(--GD);
+  font-weight:900;font-size:14px;
+  display:flex;align-items:center;justify-content:center;
+  flex-shrink:0;border:2px solid #6ee7b7;
+}
+.wnm{font-weight:700;font-size:14px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.wbar-bg{height:5px;background:#e5e7eb;border-radius:3px;margin-top:4px;}
+.wbar{height:5px;background:var(--G);border-radius:3px;}
+.wkg{font-size:17px;font-weight:900;text-align:right;min-width:55px;}
+.wcnt{font-size:11px;color:var(--GR);text-align:right;}
+
+/* SETTINGS BUTTONS */
+.bact{
+  width:100%;padding:14px;
+  border:2px solid var(--BD);border-radius:var(--RADS);
+  background:#fff;color:var(--TX);
+  font-size:15px;font-weight:700;cursor:pointer;
+  text-align:center;margin-bottom:8px;
+  touch-action:manipulation;display:block;
+}
+.bact:active{background:var(--GRL);}
+.bprim{border-color:var(--G);color:var(--GD);background:var(--GL);}
+.bdng{border-color:var(--R);color:var(--R);}
+
+.slog{
+  background:var(--GRL);border:2px solid var(--BD);border-radius:var(--RADS);
+  padding:10px 12px;font-size:12px;color:var(--TX2);
+  line-height:1.7;min-height:60px;font-family:monospace;word-break:break-all;
+  max-height:140px;overflow-y:auto;
+}
+
+/* TOAST */
+.toast{
+  position:fixed;bottom:85px;left:50%;transform:translateX(-50%);
+  background:#111827;color:#fff;
+  padding:12px 22px;border-radius:24px;
+  font-size:14px;font-weight:700;z-index:999;
+  pointer-events:none;opacity:0;transition:opacity .2s;
+  white-space:nowrap;max-width:90vw;text-align:center;
+}
+.toast.on{opacity:1;}
+
+/* INSTALL BANNER */
+.install-banner{
+  background:var(--BL);border:2px solid #93c5fd;border-radius:var(--RAD);
+  padding:13px 15px;margin-bottom:10px;display:none;
+}
+.install-banner.show{display:block;}
+.install-title{font-size:14px;font-weight:700;color:var(--B);margin-bottom:4px;}
+.install-text{font-size:12px;color:#374151;line-height:1.5;}
+</style>
+</head>
+<body>
+
+<div class="hdr">
+  <div>
+    <div class="hdr-t">🍓 Облік полуниці</div>
+    <div class="hdr-s" id="hdate"></div>
+  </div>
+  <div class="spill" id="spill" onclick="goPage('settings')">
+    <div class="sdot" id="sdot"></div>
+    <span id="slbl">—</span>
+  </div>
+</div>
+
+<!-- FORM -->
+<div class="pg on" id="pg-form">
+
+  <div class="install-banner" id="install-banner">
+    <div class="install-title">📌 Додати на екран «Додому»</div>
+    <div class="install-text">Натисніть <b>Поділитися</b> (□↑) внизу Safari → <b>«На екран "Додому"»</b> — і застосунок буде відкриватись як окрема програма без адресного рябка.</div>
+  </div>
+
+  <div class="card">
+    <div class="ctit">Працівник</div>
+    <label for="nm">Прізвище та ім'я</label>
+    <input class="inp" type="text" id="nm" placeholder="Наприклад: Іваненко Марія"
+      autocomplete="off" list="wl" inputmode="text" autocorrect="off" autocapitalize="words">
+    <datalist id="wl"></datalist>
+  </div>
+
+  <div class="card">
+    <div class="ctit">Кількість (кг)</div>
+    <div class="qrow">
+      <button class="qpm" id="bminus" type="button">−</button>
+      <div class="qnum" id="qnum">0</div>
+      <button class="qpm" id="bplus" type="button">+</button>
+    </div>
+    <div class="presets">
+      <button class="pre" data-v="5">5</button>
+      <button class="pre" data-v="10">10</button>
+      <button class="pre" data-v="15">15</button>
+      <button class="pre" data-v="20">20</button>
+      <button class="pre" data-v="25">25</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="ctit">Якість ягоди</div>
+    <div class="qgrid">
+      <button class="qopt" data-q="1" type="button">
+        <span class="ico">🟢</span><span class="qlb">Перший<br>сорт</span>
+      </button>
+      <button class="qopt" data-q="2" type="button">
+        <span class="ico">🟡</span><span class="qlb">Другий<br>сорт</span>
+      </button>
+      <button class="qopt" data-q="3" type="button">
+        <span class="ico">🔴</span><span class="qlb">Відхід</span>
+      </button>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="ctit">Час і дата збору</div>
+    <div class="tbox">
+      <div>
+        <div class="ttime" id="ttime">—</div>
+        <div class="tdate" id="tdate">—</div>
+      </div>
+      <div class="tauto">Авто</div>
+    </div>
+  </div>
+
+  <button class="bgo" id="bsubmit" type="button">✓ &nbsp;Зафіксувати збір</button>
+</div>
+
+<!-- JOURNAL -->
+<div class="pg" id="pg-journal">
+  <div class="frow">
+    <button class="chip on" data-f="today">Сьогодні</button>
+    <button class="chip" data-f="all">Всі записи</button>
+    <button class="chip" id="bcsv" style="margin-left:auto">⬇ CSV</button>
+  </div>
+  <div class="s2" id="jstats"></div>
+  <div class="tscr">
+    <table>
+      <thead><tr>
+        <th>Прізвище</th><th>Кг</th><th>Якість</th>
+        <th>Час</th><th>Синх.</th><th></th>
+      </tr></thead>
+      <tbody id="jtb"></tbody>
+    </table>
+  </div>
+</div>
+
+<!-- STATS -->
+<div class="pg" id="pg-stats">
+  <div class="s2" id="stop"></div>
+  <div class="card">
+    <div class="ctit">Якість — сьогодні</div>
+    <div id="squal"></div>
+  </div>
+  <div class="card">
+    <div class="ctit">Ефективність (весь сезон)</div>
+    <div id="swork"></div>
+  </div>
+</div>
+
+<!-- SETTINGS -->
+<div class="pg" id="pg-settings">
+  <div class="card">
+    <div class="ctit">Google Sheets — Apps Script</div>
+    <label for="iurl">URL веб-застосунку</label>
+    <input class="inp" type="url" id="iurl"
+      placeholder="https://script.google.com/macros/s/..."
+      style="margin-bottom:10px" autocorrect="off" autocapitalize="none">
+    <button class="bact bprim" id="bsave">💾 &nbsp;Зберегти URL</button>
+    <button class="bact" id="btest">🔗 &nbsp;Перевірити з'єднання</button>
+  </div>
+  <div class="card">
+    <div class="ctit">Синхронізація</div>
+    <button class="bact bprim" id="bsync">🔄 &nbsp;Синхронізувати зараз</button>
+    <div class="slog" id="slog">Очікування...</div>
+  </div>
+  <div class="card">
+    <div class="ctit">Дані</div>
+    <button class="bact" id="bexp2">⬇ &nbsp;Зберегти CSV</button>
+    <button class="bact bdng" id="bclr">🗑 &nbsp;Очистити локальні дані</button>
+  </div>
+</div>
+
+<!-- TABS -->
+<nav class="tabs">
+  <button class="tbtn on" data-p="form">
+    <svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>Запис
+  </button>
+  <button class="tbtn" data-p="journal">
+    <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M7 8h10M7 12h10M7 16h6"/></svg>Журнал
+  </button>
+  <button class="tbtn" data-p="stats">
+    <svg viewBox="0 0 24 24"><path d="M3 20h18M7 14v6M12 9v11M17 4v16"/></svg>Підсумки
+  </button>
+  <button class="tbtn" data-p="settings">
+    <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06-.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>Налаш.
+  </button>
+</nav>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ═══ CORE STATE ═══
+var recs=[],qty=0,selQ=0,jFil='today',busy=false,pressT=null,syncT=null;
+var QL={1:'Перший сорт',2:'Другий сорт',3:'Відхід'};
+var SK='pb3_recs',UK='pb3_url';
+
+function save(){try{localStorage.setItem(SK,JSON.stringify(recs));}catch(e){}refreshWL();syncUI();}
+function load(){try{var d=localStorage.getItem(SK);recs=d?JSON.parse(d):[];}catch(e){recs=[];}}
+function getURL(){return localStorage.getItem(UK)||'';}
+
+// ═══ CLOCK ═══
+function p2(n){return('0'+n).slice(-2);}
+function tick(){
+  var d=new Date();
+  var t=p2(d.getHours())+':'+p2(d.getMinutes())+':'+p2(d.getSeconds());
+  var dt=p2(d.getDate())+'.'+p2(d.getMonth()+1)+'.'+d.getFullYear();
+  el('ttime').textContent=t;el('tdate').textContent=dt;el('hdate').textContent=dt;
+}
+function nowObj(){
+  var d=new Date();
+  return{
+    time:p2(d.getHours())+':'+p2(d.getMinutes())+':'+p2(d.getSeconds()),
+    date:p2(d.getDate())+'.'+p2(d.getMonth()+1)+'.'+d.getFullYear(),
+    iso:d.getFullYear()+'-'+p2(d.getMonth()+1)+'-'+p2(d.getDate()),
+    ts:d.getFullYear()+'-'+p2(d.getMonth()+1)+'-'+p2(d.getDate())+' '+p2(d.getHours())+':'+p2(d.getMinutes())+':'+p2(d.getSeconds())
+  };
+}
+setInterval(tick,1000);tick();
+
+// ═══ HELPERS ═══
+function el(id){return document.getElementById(id);}
+function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+var toastT2;
+function toast(m,d){
+  var t=el('toast');t.textContent=m;t.classList.add('on');
+  clearTimeout(toastT2);toastT2=setTimeout(function(){t.classList.remove('on');},d||2500);
+}
+function log(m){
+  var e=el('slog'),d=new Date(),t=p2(d.getHours())+':'+p2(d.getMinutes())+':'+p2(d.getSeconds());
+  e.textContent=t+' '+m+'\n'+e.textContent;
+  e.textContent=e.textContent.slice(0,1000);
+}
+
+// ═══ QTY ═══
+function setQ(v){qty=Math.max(0,Math.round(v*2)/2);el('qnum').textContent=qty%1===0?qty:qty.toFixed(1);}
+el('bminus').addEventListener('click',function(){setQ(qty-1);});
+el('bplus').addEventListener('click',function(){setQ(qty+1);});
+
+// Touch hold = 0.5 steps
+function startHold(dir){pressT=setInterval(function(){setQ(qty+dir*0.5);},160);}
+function stopHold(){clearInterval(pressT);}
+['bminus','bplus'].forEach(function(id){
+  var d=id==='bplus'?1:-1;
+  el(id).addEventListener('touchstart',function(e){e.preventDefault();setQ(qty+d);startHold(d);},{passive:false});
+  el(id).addEventListener('touchend',stopHold);
+  el(id).addEventListener('touchcancel',stopHold);
+});
+document.querySelectorAll('.pre').forEach(function(b){
+  b.addEventListener('click',function(){setQ(parseInt(b.dataset.v));});
+});
+
+// ═══ QUALITY ═══
+document.querySelectorAll('.qopt').forEach(function(b){
+  b.addEventListener('click',function(){
+    selQ=parseInt(b.dataset.q);
+    document.querySelectorAll('.qopt').forEach(function(x){
+      x.className='qopt'+(parseInt(x.dataset.q)===selQ?' s'+selQ:'');
+    });
+  });
+});
+
+// ═══ SUBMIT ═══
+el('bsubmit').addEventListener('click',function(){
+  var name=el('nm').value.trim();
+  if(!name){toast('⚠ Введіть прізвище');return;}
+  if(qty<=0){toast('⚠ Вкажіть кількість кг');return;}
+  if(!selQ){toast('⚠ Оберіть якість');return;}
+  var n=nowObj();
+  var r={id:Date.now()+'_'+Math.random().toString(36).slice(2,5),
+    name:name,qty:qty,quality:selQ,qualityLabel:QL[selQ],
+    time:n.time,date:n.date,iso:n.iso,ts:n.ts,synced:false};
+  recs.push(r);save();
+  toast('✓ '+name+' — '+qty+' кг');
+  setQ(0);selQ=0;
+  document.querySelectorAll('.qopt').forEach(function(b){b.className='qopt';});
+  sched();
+});
+
+// ═══ NAVIGATION ═══
+function goPage(p){
+  document.querySelectorAll('.pg').forEach(function(x){x.classList.remove('on');});
+  document.querySelectorAll('.tbtn').forEach(function(x){x.classList.remove('on');});
+  el('pg-'+p).classList.add('on');
+  document.querySelector('[data-p="'+p+'"]').classList.add('on');
+  if(p==='journal')renderJ();
+  if(p==='stats')renderS();
+  if(p==='settings')el('iurl').value=getURL();
+}
+document.querySelectorAll('.tbtn').forEach(function(b){
+  b.addEventListener('click',function(){goPage(b.dataset.p);});
+});
+
+// ═══ JOURNAL ═══
+function getFil(){
+  if(jFil==='today'){var t=nowObj().iso;return recs.filter(function(r){return r.iso===t;});}
+  return recs.slice();
+}
+function renderJ(){
+  var data=getFil().slice().reverse();
+  var tot=data.reduce(function(s,r){return s+r.qty;},0);
+  var pen=data.filter(function(r){return!r.synced;}).length;
+  el('jstats').innerHTML=
+    '<div class="sbox"><div class="slb">Зібрано кг</div><div class="svl">'+tot.toFixed(1)+'</div><div class="ssb">'+data.length+' здач</div></div>'+
+    '<div class="sbox"><div class="slb">Не синхрон.</div><div class="svl">'+pen+'</div><div class="ssb">записів</div></div>';
+  var qb={1:'bg',2:'ba',3:'br'};
+  var qs={1:'1-й сорт',2:'2-й сорт',3:'Відхід'};
+  var tb=el('jtb');
+  if(!data.length){tb.innerHTML='<tr><td colspan="6"><div class="empty">Записів немає</div></td></tr>';return;}
+  tb.innerHTML=data.map(function(r){
+    return'<tr>'+
+      '<td style="font-weight:700;max-width:80px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+esc(r.name)+'</td>'+
+      '<td style="font-weight:900">'+r.qty+'</td>'+
+      '<td><span class="badge '+qb[r.quality]+'">'+qs[r.quality]+'</span></td>'+
+      '<td style="font-size:11px;color:#6b7280;white-space:nowrap">'+r.time+'<br>'+r.date+'</td>'+
+      '<td><span class="badge '+(r.synced?'bg':'bgr')+'">'+(r.synced?'✓':'...')+'</span></td>'+
+      '<td><button class="dbtn" data-id="'+r.id+'">✕</button></td>'+
+    '</tr>';
+  }).join('');
+  tb.querySelectorAll('.dbtn').forEach(function(b){
+    b.addEventListener('click',function(){
+      if(confirm('Видалити цей запис?')){
+        recs=recs.filter(function(r){return r.id!==b.dataset.id;});
+        save();renderJ();
+      }
+    });
+  });
+}
+document.querySelectorAll('[data-f]').forEach(function(b){
+  b.addEventListener('click',function(){
+    jFil=b.dataset.f;
+    document.querySelectorAll('[data-f]').forEach(function(x){x.classList.remove('on');});
+    b.classList.add('on');renderJ();
+  });
+});
+el('bcsv').addEventListener('click',doCSV);
+
+// ═══ STATS ═══
+function renderS(){
+  var tod=nowObj().iso;
+  var today=recs.filter(function(r){return r.iso===tod;});
+  var tot=today.reduce(function(s,r){return s+r.qty;},0);
+  var q1=today.filter(function(r){return r.quality===1;}).reduce(function(s,r){return s+r.qty;},0);
+  var q2=today.filter(function(r){return r.quality===2;}).reduce(function(s,r){return s+r.qty;},0);
+  var q3=today.filter(function(r){return r.quality===3;}).reduce(function(s,r){return s+r.qty;},0);
+  var allT=recs.reduce(function(s,r){return s+r.qty;},0);
+  el('stop').innerHTML=
+    '<div class="sbox"><div class="slb">Сьогодні</div><div class="svl">'+tot.toFixed(1)+' кг</div><div class="ssb">'+today.length+' здач</div></div>'+
+    '<div class="sbox"><div class="slb">Сезон</div><div class="svl">'+allT.toFixed(1)+' кг</div><div class="ssb">'+recs.length+' записів</div></div>';
+  var qi=[{l:'Перший сорт',k:q1,c:'#1a8a4a'},{l:'Другий сорт',k:q2,c:'#c47a00'},{l:'Відхід',k:q3,c:'#c0392b'}];
+  el('squal').innerHTML=tot>0?qi.map(function(q){
+    var pct=Math.round(q.k/tot*100);
+    return'<div class="qbar"><div class="qbar-h"><span style="font-weight:700;color:#374151">'+q.l+'</span>'+
+      '<span style="font-weight:900;color:'+q.c+'">'+q.k.toFixed(1)+' кг &nbsp;'+pct+'%</span></div>'+
+      '<div class="qbar-bg"><div class="qbar-f" style="width:'+pct+'%;background:'+q.c+'"></div></div></div>';
+  }).join(''):'<div class="empty">Немає даних за сьогодні</div>';
+  var wm={};
+  recs.forEach(function(r){if(!wm[r.name])wm[r.name]={name:r.name,tot:0,cnt:0};wm[r.name].tot+=r.qty;wm[r.name].cnt++;});
+  var wa=Object.values(wm).sort(function(a,b){return b.tot-a.tot;});
+  var mx=wa.length?wa[0].tot:1;
+  el('swork').innerHTML=wa.length?wa.map(function(w){
+    var ini=w.name.split(' ').map(function(p){return p[0]||'';}).join('').slice(0,2).toUpperCase();
+    var pct=Math.round(w.tot/mx*100);
+    return'<div class="wrow">'+
+      '<div class="wini">'+ini+'</div>'+
+      '<div style="flex:1;min-width:0"><div class="wnm">'+esc(w.name)+'</div>'+
+      '<div class="wbar-bg"><div class="wbar" style="width:'+pct+'%"></div></div></div>'+
+      '<div><div class="wkg">'+w.tot.toFixed(1)+'</div><div class="wcnt">'+w.cnt+' здач</div></div>'+
+    '</div>';
+  }).join(''):'<div class="empty">Немає даних</div>';
+}
+
+// ═══ SYNC ═══
+function sched(){clearTimeout(syncT);syncT=setTimeout(doSync,1500);}
+
+function doSync(){
+  var url=getURL();
+  if(!url||busy||!navigator.onLine)return;
+  var pend=recs.filter(function(r){return!r.synced;});
+  if(!pend.length)return;
+  busy=true;syncUI();
+  log('Надсилаємо '+pend.length+' записів...');
+  fetch(url,{
+    method:'POST',
+    body:JSON.stringify({records:pend}),
+    headers:{'Content-Type':'text/plain'}
+  })
+  .then(function(r){return r.text();})
+  .then(function(txt){
+    try{
+      var d=JSON.parse(txt);
+      if(d.success){mark(pend);log('✓ Синхронізовано '+d.added+' записів');}
+      else{log('Помилка: '+(d.error||'?'));}
+    }catch(e){
+      // Apps Script може повернути redirect — спробуємо no-cors
+      log('Відповідь не JSON, спроба no-cors...');
+      noCors(pend,url);return;
+    }
+    busy=false;syncUI();
+  })
+  .catch(function(){
+    log('Пряме з\'єднання заблоковано, спроба no-cors...');
+    noCors(pend,url);
+  });
+}
+
+function noCors(pend,url){
+  fetch(url,{method:'POST',mode:'no-cors',body:JSON.stringify({records:pend}),headers:{'Content-Type':'text/plain'}})
+  .then(function(){
+    log('Запит надіслано. Перевірка через 4с...');
+    setTimeout(function(){
+      fetch(url+'?ping=1')
+      .then(function(r){return r.json();})
+      .then(function(d){
+        if(d.success){mark(pend);log('✓ Підтверджено '+pend.length+' записів');}
+        busy=false;syncUI();
+      })
+      .catch(function(){
+        mark(pend);log('✓ Надіслано (без підтвердження)');
+        busy=false;syncUI();
+      });
+    },4000);
+  })
+  .catch(function(e){log('Не вдалось: '+e.message);busy=false;syncUI();});
+}
+
+function mark(pend){
+  var ids={};pend.forEach(function(r){ids[r.id]=1;});
+  recs.forEach(function(r){if(ids[r.id])r.synced=true;});
+  save();
+}
+
+function syncUI(){
+  var pen=recs.filter(function(r){return!r.synced;}).length;
+  var dot=el('sdot'),lbl=el('slbl');
+  if(busy){dot.className='sdot busy';lbl.textContent='Синхронізація...';}
+  else if(!navigator.onLine){dot.className='sdot';lbl.textContent=pen?'Офлайн ('+pen+')':'Офлайн';}
+  else if(pen>0){dot.className='sdot';lbl.textContent=pen+' очікує';}
+  else{dot.className='sdot ok';lbl.textContent='Синхронізовано';}
+}
+
+window.addEventListener('online',function(){syncUI();sched();});
+window.addEventListener('offline',syncUI);
+setInterval(function(){if(navigator.onLine&&!busy)doSync();},30000);
+
+// ═══ SETTINGS ═══
+el('bsave').addEventListener('click',function(){
+  var url=el('iurl').value.trim();
+  if(!url.startsWith('https://')){toast('Невірний URL');return;}
+  localStorage.setItem(UK,url);toast('✓ URL збережено');log('URL збережено');sched();
+});
+el('btest').addEventListener('click',function(){
+  var url=getURL();
+  if(!url){toast('Вкажіть URL');return;}
+  log('Перевірка...');
+  fetch(url)
+  .then(function(r){return r.json();})
+  .then(function(d){log('✓ OK: '+(d.message||'сервер відповідає'));toast('✓ З\'єднання працює!');})
+  .catch(function(e){log('Помилка: '+e.message);toast('Помилка з\'єднання — перевірте URL');});
+});
+el('bsync').addEventListener('click',function(){
+  if(!getURL()){toast('Вкажіть URL скрипту');return;}
+  if(!navigator.onLine){toast('Немає інтернету');return;}
+  doSync();toast('Синхронізацію запущено...');
+});
+el('bexp2').addEventListener('click',doCSV);
+el('bclr').addEventListener('click',function(){
+  if(confirm('Видалити всі локальні записи?\nGoogle Sheets залишиться.')){recs=[];save();toast('Очищено');}
+});
+
+// ═══ CSV ═══
+function doCSV(){
+  var data=getFil();
+  if(!data.length){toast('Немає даних');return;}
+  var rows=data.map(function(r){return'"'+r.name+'",'+r.qty+',"'+r.qualityLabel+'","'+r.ts+'","'+(r.synced?'Так':'Ні')+'"';});
+  var csv='\ufeff'+'Прізвище,Кг,Якість,Дата і час,Синхронізовано\n'+rows.join('\n');
+  var a=document.createElement('a');
+  a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8'}));
+  a.download='polunytsia_'+nowObj().iso+'.csv';document.body.appendChild(a);a.click();document.body.removeChild(a);
+  toast('CSV збережено');
+}
+
+// ═══ WORKER LIST ═══
+function refreshWL(){
+  var names=[...new Set(recs.map(function(r){return r.name;}))];
+  el('wl').innerHTML=names.map(function(n){return'<option value="'+esc(n)+'">';}).join('');
+}
+
+// ═══ iOS INSTALL HINT ═══
+var isIOS=/iphone|ipad|ipod/i.test(navigator.userAgent);
+var isStandalone=window.navigator.standalone===true;
+if(isIOS&&!isStandalone&&!localStorage.getItem('inst_shown')){
+  el('install-banner').classList.add('show');
+  localStorage.setItem('inst_shown','1');
+}
+
+// ═══ INIT ═══
+load();setQ(0);refreshWL();syncUI();
+</script>
+</body>
+</html>
