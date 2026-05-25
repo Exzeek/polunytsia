@@ -258,6 +258,40 @@ tbody tr:last-child td{border-bottom:none;}
 .install-banner.show{display:block;}
 .install-title{font-size:14px;font-weight:700;color:var(--B);margin-bottom:4px;}
 .install-text{font-size:12px;color:#374151;line-height:1.5;}
+/* DELETE MODAL */
+.del-modal{
+  position:fixed;inset:0;z-index:500;
+  background:rgba(0,0,0,.55);
+  display:flex;align-items:center;justify-content:center;
+  padding:20px;
+  opacity:0;pointer-events:none;transition:opacity .2s;
+}
+.del-modal.show{opacity:1;pointer-events:all;}
+.del-box{
+  background:#fff;border-radius:16px;padding:22px;
+  width:100%;max-width:360px;
+  box-shadow:0 20px 60px rgba(0,0,0,.3);
+}
+.del-icon{font-size:36px;text-align:center;margin-bottom:6px;}
+.del-title{font-size:18px;font-weight:800;color:#111827;text-align:center;margin-bottom:14px;}
+.del-info{background:#f9fafb;border-radius:10px;padding:12px;margin-bottom:10px;border:1.5px solid #e5e7eb;}
+.del-row{display:flex;justify-content:space-between;align-items:center;padding:5px 0;border-bottom:1px solid #f0f0f0;font-size:13px;}
+.del-row:last-child{border-bottom:none;}
+.del-row span{color:#6b7280;font-weight:500;}
+.del-row b{color:#111827;font-weight:700;text-align:right;max-width:60%;word-break:break-word;}
+.del-warn b{color:#c0392b;}
+.del-note{font-size:11px;color:#6b7280;text-align:center;margin-bottom:14px;font-style:italic;}
+.del-btns{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.del-btn-cancel{
+  padding:13px;border:2px solid #d1d5db;border-radius:10px;
+  background:#fff;color:#374151;font-size:15px;font-weight:700;cursor:pointer;
+}
+.del-btn-cancel:active{background:#f3f4f6;}
+.del-btn-ok{
+  padding:13px;border:none;border-radius:10px;
+  background:#c0392b;color:#fff;font-size:15px;font-weight:700;cursor:pointer;
+}
+.del-btn-ok:active{background:#991b1b;}
 </style>
 </head>
 <body>
@@ -394,6 +428,7 @@ tbody tr:last-child td{border-bottom:none;}
   <div class="card">
     <div class="ctit">Дані</div>
     <button class="bact" id="bexp2">⬇ &nbsp;Зберегти CSV</button>
+    <button class="bact" id="bdellog" style="border-color:#c47a00;color:#c47a00">🗂 &nbsp;Журнал видалених записів</button>
     <button class="bact bdng" id="bclr">🗑 &nbsp;Очистити локальні дані</button>
   </div>
 </div>
@@ -415,6 +450,26 @@ tbody tr:last-child td{border-bottom:none;}
 </nav>
 
 <div class="toast" id="toast"></div>
+
+<!-- DELETE MODAL -->
+<div class="del-modal" id="del-modal">
+  <div class="del-box">
+    <div class="del-icon">⚠️</div>
+    <div class="del-title">Видалити запис?</div>
+    <div class="del-info">
+      <div class="del-row"><span>Працівник</span><b id="del-name">—</b></div>
+      <div class="del-row"><span>Кількість</span><b id="del-qty">—</b></div>
+      <div class="del-row"><span>Якість</span><b id="del-qual">—</b></div>
+      <div class="del-row"><span>Час</span><b id="del-time">—</b></div>
+      <div class="del-row del-warn"><span>Синхронізовано</span><b id="del-synced">—</b></div>
+    </div>
+    <div class="del-note">Видалені записи зберігаються в окремому журналі</div>
+    <div class="del-btns">
+      <button class="del-btn-cancel" id="del-cancel">Скасувати</button>
+      <button class="del-btn-ok" id="del-confirm">Видалити</button>
+    </div>
+  </div>
+</div>
 
 <script>
 // ═══ CORE STATE ═══
@@ -561,16 +616,11 @@ function renderJ(){
       '<td><span class="badge '+qb[r.quality]+'">'+qs[r.quality]+'</span></td>'+
       '<td style="font-size:11px;color:#6b7280;white-space:nowrap">'+r.time+'<br>'+r.date+'</td>'+
       '<td><span class="badge '+(r.synced?'bg':'bgr')+'">'+(r.synced?'✓':'...')+'</span></td>'+
-      '<td><button class="dbtn" data-id="'+r.id+'">✕</button></td>'+
+      '<td><button class="dbtn" data-id="'+r.id+'">🗑</button></td>'+
     '</tr>';
   }).join('');
   tb.querySelectorAll('.dbtn').forEach(function(b){
-    b.addEventListener('click',function(){
-      if(confirm('Видалити цей запис?')){
-        recs=recs.filter(function(r){return r.id!==b.dataset.id;});
-        save();renderJ();
-      }
-    });
+    b.addEventListener('click',function(){showDeleteModal(b.dataset.id);});
   });
 }
 document.querySelectorAll('[data-f]').forEach(function(b){
@@ -581,6 +631,64 @@ document.querySelectorAll('[data-f]').forEach(function(b){
   });
 });
 el('bcsv').addEventListener('click',doCSV);
+
+// ═══ DELETE MODAL ═══
+var pendingDeleteId=null;
+function showDeleteModal(id){
+  var rec=recs.find(function(r){return r.id===id;});
+  if(!rec)return;
+  pendingDeleteId=id;
+  el('del-name').textContent=rec.name;
+  el('del-qty').textContent=rec.qty+' кг';
+  el('del-qual').textContent=rec.qualityLabel||'—';
+  el('del-time').textContent=rec.time+' '+rec.date;
+  el('del-synced').textContent=rec.synced?'Так (буде видалено з Google Sheets)':'Ні (тільки локально)';
+  el('del-modal').classList.add('show');
+}
+el('del-cancel').addEventListener('click',function(){
+  el('del-modal').classList.remove('show');
+  pendingDeleteId=null;
+});
+el('del-confirm').addEventListener('click',function(){
+  if(!pendingDeleteId)return;
+  var rec=recs.find(function(r){return r.id===pendingDeleteId;});
+  if(!rec){el('del-modal').classList.remove('show');return;}
+
+  // Зберігаємо в лог видалених
+  var deleted=JSON.parse(localStorage.getItem('pb3_deleted')||'[]');
+  deleted.push({
+    id:rec.id, name:rec.name, qty:rec.qty,
+    qualityLabel:rec.qualityLabel, ts:rec.ts,
+    time:rec.time, date:rec.date, iso:rec.iso,
+    synced:rec.synced,
+    deletedAt:nowObj().ts
+  });
+  localStorage.setItem('pb3_deleted',JSON.stringify(deleted));
+
+  // Якщо запис синхронізований — надсилаємо команду видалення в Sheets
+  if(rec.synced){
+    scheduleDelete(rec.id);
+  }
+
+  // Видаляємо локально
+  recs=recs.filter(function(r){return r.id!==pendingDeleteId;});
+  save();
+  el('del-modal').classList.remove('show');
+  pendingDeleteId=null;
+  toast('Запис видалено');
+  renderJ();
+});
+
+// Надсилаємо ID на видалення в Google Sheets
+function scheduleDelete(id){
+  var url=getURL();
+  if(!url||!navigator.onLine)return;
+  fetch(url,{
+    method:'POST',
+    body:JSON.stringify({action:'delete',id:id}),
+    headers:{'Content-Type':'text/plain'}
+  }).catch(function(){});
+}
 
 // ═══ STATS ═══
 function renderS(){
@@ -740,6 +848,20 @@ if(isIOS&&!isStandalone&&!localStorage.getItem('inst_shown')){
   el('install-banner').classList.add('show');
   localStorage.setItem('inst_shown','1');
 }
+
+el('bdellog').addEventListener('click',function(){
+  var deleted=JSON.parse(localStorage.getItem('pb3_deleted')||'[]');
+  if(!deleted.length){toast('Журнал видалених порожній');return;}
+  var rows=deleted.slice().reverse().map(function(r){
+    return'"'+r.name+'",'+r.qty+',"'+(r.qualityLabel||'')+'","'+(r.ts||'')+'","'+(r.synced?'Так':'Ні')+'","'+r.deletedAt+'"';
+  });
+  var csv='\ufeff'+'Прізвище,Кг,Якість,Дата запису,Був синхр.,Видалено о\n'+rows.join('\n');
+  var a=document.createElement('a');
+  a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8'}));
+  a.download='vydaleni_'+nowObj().iso+'.csv';
+  document.body.appendChild(a);a.click();document.body.removeChild(a);
+  toast('CSV видалених збережено ('+deleted.length+' записів)');
+});
 
 // ═══ INIT ═══
 load();setQ(0);refreshWL();syncUI();checkReady();
