@@ -292,6 +292,31 @@ tbody tr:last-child td{border-bottom:none;}
   background:#c0392b;color:#fff;font-size:15px;font-weight:700;cursor:pointer;
 }
 .del-btn-ok:active{background:#991b1b;}
+/* VARIETY SLIDER */
+.var-wrap{overflow:hidden;border-radius:var(--RADS);border:2.5px solid var(--G);margin-bottom:10px;touch-action:pan-y;}
+.var-track{display:flex;transition:transform .3s cubic-bezier(.4,0,.2,1);will-change:transform;}
+.var-slide{
+  flex:0 0 100%;padding:0;
+  display:flex;
+}
+.var-btn{
+  flex:1;padding:18px 8px;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;
+  background:#fff;border:none;cursor:pointer;touch-action:manipulation;
+  transition:background .15s;
+}
+.var-btn:active{background:var(--GL);}
+.var-btn.active{background:var(--GL);}
+.var-btn .vi{font-size:28px;}
+.var-btn .vn{font-size:16px;font-weight:800;color:var(--TX);}
+.var-btn.active .vn{color:var(--GD);}
+.var-btn .vs{font-size:11px;color:var(--GR);font-weight:500;}
+.var-sep{width:1.5px;background:var(--BD2);flex-shrink:0;}
+.var-dots{display:flex;justify-content:center;gap:10px;margin-bottom:6px;}
+.var-dot{width:10px;height:10px;border-radius:50%;background:var(--BD2);cursor:pointer;transition:all .2s;border:none;padding:0;}
+.var-dot.on{background:var(--G);transform:scale(1.3);}
+.var-sel{text-align:center;font-size:14px;font-weight:700;color:var(--GD);background:var(--GL);border-radius:20px;padding:6px 16px;border:2px solid var(--G);}
+
 </style>
 </head>
 <body>
@@ -348,6 +373,34 @@ tbody tr:last-child td{border-bottom:none;}
     </div>
   </div>
 
+  <!-- Сорт ягоди -->
+  <div class="card">
+    <div class="ctit">Сорт полуниці</div>
+    <div class="var-wrap" id="var-wrap">
+      <div class="var-track" id="var-track">
+        <div class="var-slide">
+          <button class="var-btn active" data-vi="0" type="button">
+            <span class="vi">🍓</span><span class="vn">Хоней</span><span class="vs">Класичний солодкий</span>
+          </button>
+          <div class="var-sep"></div>
+          <button class="var-btn" data-vi="1" type="button">
+            <span class="vi">🍓</span><span class="vn">Румба</span><span class="vs">Ранній великоплідний</span>
+          </button>
+          <div class="var-sep"></div>
+          <button class="var-btn" data-vi="2" type="button">
+            <span class="vi">🍓</span><span class="vn">Верді</span><span class="vs">Пізній зимостійкий</span>
+          </button>
+        </div>
+      </div>
+    </div>
+    <div class="var-dots">
+      <button class="var-dot on" data-vd="0" type="button"></button>
+      <button class="var-dot" data-vd="1" type="button"></button>
+      <button class="var-dot" data-vd="2" type="button"></button>
+    </div>
+    <div class="var-sel" id="var-sel">🍓 Хоней</div>
+  </div>
+
   <div class="card">
     <div class="ctit">Якість ягоди</div>
     <div class="qgrid">
@@ -400,17 +453,45 @@ tbody tr:last-child td{border-bottom:none;}
 <div class="pg" id="pg-stats">
   <div class="s2" id="stop"></div>
   <div class="card">
-    <div class="ctit">Якість — сьогодні</div>
+    <div class="ctit">Розподіл по якості</div>
     <div id="squal"></div>
   </div>
   <div class="card">
-    <div class="ctit">Ефективність (весь сезон)</div>
+    <div class="ctit">Ефективність і зарплата</div>
     <div id="swork"></div>
   </div>
 </div>
 
 <!-- SETTINGS -->
 <div class="pg" id="pg-settings">
+  <div class="card">
+    <div class="ctit">💰 Ціна за кг (для розрахунку зарплати)</div>
+    <div style="display:grid;gap:10px">
+      <div style="display:flex;align-items:center;gap:10px;background:var(--GL);border-radius:var(--RADS);padding:12px;border:2px solid var(--G)">
+        <span style="font-size:20px">🟢</span>
+        <span style="flex:1;font-weight:700;color:var(--GD);font-size:14px">З чашолистком</span>
+        <input type="number" id="p-zch" min="0" step="0.5" value="0"
+          style="width:80px;text-align:center;font-size:18px;font-weight:800;color:var(--GD);border:2px solid var(--G);border-radius:8px;padding:6px;background:#fff">
+        <span style="font-weight:700;color:var(--GD)">грн</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:10px;background:var(--AL);border-radius:var(--RADS);padding:12px;border:2px solid var(--A)">
+        <span style="font-size:20px">🟡</span>
+        <span style="flex:1;font-weight:700;color:var(--A);font-size:14px">Без чашолистка</span>
+        <input type="number" id="p-bch" min="0" step="0.5" value="0"
+          style="width:80px;text-align:center;font-size:18px;font-weight:800;color:var(--A);border:2px solid var(--A);border-radius:8px;padding:6px;background:#fff">
+        <span style="font-weight:700;color:var(--A)">грн</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:10px;background:var(--RL);border-radius:var(--RADS);padding:12px;border:2px solid var(--R)">
+        <span style="font-size:20px">🔴</span>
+        <span style="flex:1;font-weight:700;color:var(--R);font-size:14px">Прес-якість</span>
+        <input type="number" id="p-prs" min="0" step="0.5" value="0"
+          style="width:80px;text-align:center;font-size:18px;font-weight:800;color:var(--R);border:2px solid var(--R);border-radius:8px;padding:6px;background:#fff">
+        <span style="font-weight:700;color:var(--R)">грн</span>
+      </div>
+    </div>
+    <button class="bact bprim" id="bsaveprices" style="margin-top:10px">💾 &nbsp;Зберегти ціни</button>
+  </div>
+
   <div class="card">
     <div class="ctit">Google Sheets — Apps Script</div>
     <label for="iurl">URL веб-застосунку</label>
@@ -491,11 +572,21 @@ function tick(){
 }
 function nowObj(){
   var d=new Date();
+  // Використовуємо локальний час телефону для відображення
+  // але зберігаємо timestamp сумісний з ID (мілісекунди UTC → київський час)
+  var offset=3; // Київ UTC+3 (влітку)
+  var kyiv=new Date(d.getTime()+offset*3600*1000-d.getTimezoneOffset()*60*1000);
+  var yr=kyiv.getUTCFullYear();
+  var mo=p2(kyiv.getUTCMonth()+1);
+  var dy=p2(kyiv.getUTCDate());
+  var hr=p2(kyiv.getUTCHours());
+  var mi=p2(kyiv.getUTCMinutes());
+  var sc=p2(kyiv.getUTCSeconds());
   return{
-    time:p2(d.getHours())+':'+p2(d.getMinutes())+':'+p2(d.getSeconds()),
-    date:p2(d.getDate())+'.'+p2(d.getMonth()+1)+'.'+d.getFullYear(),
-    iso:d.getFullYear()+'-'+p2(d.getMonth()+1)+'-'+p2(d.getDate()),
-    ts:d.getFullYear()+'-'+p2(d.getMonth()+1)+'-'+p2(d.getDate())+' '+p2(d.getHours())+':'+p2(d.getMinutes())+':'+p2(d.getSeconds())
+    time:hr+':'+mi+':'+sc,
+    date:dy+'.'+mo+'.'+yr,
+    iso:yr+'-'+mo+'-'+dy,
+    ts:yr+'-'+mo+'-'+dy+' '+hr+':'+mi+':'+sc
   };
 }
 setInterval(tick,1000);tick();
@@ -541,6 +632,47 @@ document.querySelectorAll('.pre').forEach(function(b){
   b.addEventListener('click',function(){setQ(parseInt(b.dataset.v));});
 });
 
+// ═══ VARIETY ═══
+var VARS=[{n:'Хоней',s:'Класичний солодкий'},{n:'Румба',s:'Ранній великоплідний'},{n:'Верді',s:'Пізній зимостійкий'}];
+var selVar='Хоней';
+var varIdx=0;
+
+function goVar(idx){
+  varIdx=Math.max(0,Math.min(2,idx));
+  selVar=VARS[varIdx].n;
+  document.querySelectorAll('.var-btn').forEach(function(b,i){
+    b.classList.toggle('active',i===varIdx);
+  });
+  document.querySelectorAll('.var-dot').forEach(function(d,i){
+    d.classList.toggle('on',i===varIdx);
+  });
+  el('var-sel').textContent='🍓 '+selVar;
+}
+
+// Кліки на кнопки сортів
+document.querySelectorAll('.var-btn').forEach(function(b){
+  b.addEventListener('click',function(){goVar(parseInt(b.dataset.vi));});
+});
+// Кліки на точки
+document.querySelectorAll('.var-dot').forEach(function(d){
+  d.addEventListener('click',function(){goVar(parseInt(d.dataset.vd));});
+});
+
+// Свайп
+var vTouchX=0,vTouchY=0;
+var vWrap=el('var-wrap');
+vWrap.addEventListener('touchstart',function(e){
+  vTouchX=e.touches[0].clientX;
+  vTouchY=e.touches[0].clientY;
+},{passive:true});
+vWrap.addEventListener('touchend',function(e){
+  var dx=e.changedTouches[0].clientX-vTouchX;
+  var dy=e.changedTouches[0].clientY-vTouchY;
+  if(Math.abs(dx)>Math.abs(dy)&&Math.abs(dx)>40){
+    goVar(varIdx+(dx<0?1:-1));
+  }
+},{passive:true});
+
 // ═══ QUALITY ═══
 document.querySelectorAll('.qopt').forEach(function(b){
   b.addEventListener('click',function(){
@@ -570,9 +702,12 @@ el('bsubmit').addEventListener('click',function(){
   var n=nowObj();
   var r={id:Date.now()+'_'+Math.random().toString(36).slice(2,5),
     name:name,qty:qty,quality:selQ,qualityLabel:QL[selQ],
+    variety:selVar,
     time:n.time,date:n.date,iso:n.iso,ts:n.ts,synced:false};
   recs.push(r);save();
-  toast('✓ '+name+' — '+qty+' кг');
+  toast('✓ '+name+' — '+selVar+' — '+qty+' кг');
+  // Скидаємо форму — ім'я теж очищаємо
+  el('nm').value='';
   setQ(0);selQ=0;
   document.querySelectorAll('.qopt').forEach(function(b){b.className='qopt';});
   checkReady();
@@ -587,7 +722,7 @@ function goPage(p){
   document.querySelector('[data-p="'+p+'"]').classList.add('on');
   if(p==='journal')renderJ();
   if(p==='stats')renderS();
-  if(p==='settings')el('iurl').value=getURL();
+  if(p==='settings'){el('iurl').value=getURL();loadPriceInputs();}
 }
 document.querySelectorAll('.tbtn').forEach(function(b){
   b.addEventListener('click',function(){goPage(b.dataset.p);});
@@ -691,38 +826,96 @@ function scheduleDelete(id){
 }
 
 // ═══ STATS ═══
+function getPrices(){
+  return{
+    z:parseFloat(localStorage.getItem('pb_price_z'))||0,
+    b:parseFloat(localStorage.getItem('pb_price_b'))||0,
+    p:parseFloat(localStorage.getItem('pb_price_p'))||0
+  };
+}
+
+function calcSalary(recs, prices){
+  var s=0;
+  recs.forEach(function(r){
+    var p=r.quality===1?prices.z:r.quality===2?prices.b:r.quality===3?prices.p:0;
+    s+=r.qty*p;
+  });
+  return Math.round(s*100)/100;
+}
+
+var statsFil='today'; // фільтр для Підсумків
+
 function renderS(){
+  var prices=getPrices();
   var tod=nowObj().iso;
-  var today=recs.filter(function(r){return r.iso===tod;});
-  var tot=today.reduce(function(s,r){return s+r.qty;},0);
-  var q1=today.filter(function(r){return r.quality===1;}).reduce(function(s,r){return s+r.qty;},0);
-  var q2=today.filter(function(r){return r.quality===2;}).reduce(function(s,r){return s+r.qty;},0);
-  var q3=today.filter(function(r){return r.quality===3;}).reduce(function(s,r){return s+r.qty;},0);
-  var allT=recs.reduce(function(s,r){return s+r.qty;},0);
+  var filtered=statsFil==='today'?recs.filter(function(r){return r.iso===tod;}):recs.slice();
+  var filtLabel=statsFil==='today'?'Сьогодні':'Весь сезон';
+
+  var tot=filtered.reduce(function(s,r){return s+r.qty;},0);
+  var q1=filtered.filter(function(r){return r.quality===1;}).reduce(function(s,r){return s+r.qty;},0);
+  var q2=filtered.filter(function(r){return r.quality===2;}).reduce(function(s,r){return s+r.qty;},0);
+  var q3=filtered.filter(function(r){return r.quality===3;}).reduce(function(s,r){return s+r.qty;},0);
+  var salary=calcSalary(filtered,prices);
+  var hasPrices=prices.z||prices.b||prices.p;
+
   el('stop').innerHTML=
-    '<div class="sbox"><div class="slb">Сьогодні</div><div class="svl">'+tot.toFixed(1)+' кг</div><div class="ssb">'+today.length+' здач</div></div>'+
-    '<div class="sbox"><div class="slb">Сезон</div><div class="svl">'+allT.toFixed(1)+' кг</div><div class="ssb">'+recs.length+' записів</div></div>';
+    '<div class="sbox"><div class="slb">'+filtLabel+' зібрано</div><div class="svl">'+tot.toFixed(1)+' кг</div><div class="ssb">'+filtered.length+' здач</div></div>'+
+    '<div class="sbox"><div class="slb">Зарплата'+( statsFil==='today'?' за день':' за сезон')+'</div><div class="svl" style="color:#1a8a4a">'+
+      (hasPrices?salary.toFixed(0)+' ₴':'—')+
+    '</div><div class="ssb">'+(hasPrices?'За поточними цінами':'⚙ Вкажіть ціни')+'</div></div>';
+
+  // Фільтр-перемикач
+  var fhtml='<div style="display:flex;gap:6px;margin-bottom:10px">'+
+    '<button class="chip'+(statsFil==='today'?' on':'')+'" id="sf-today">Сьогодні</button>'+
+    '<button class="chip'+(statsFil==='all'?' on':'')+'" id="sf-all">Весь сезон</button>'+
+    '</div>';
+
+  // Якість
   var qi=[{l:'З чашолистком',k:q1,c:'#1a8a4a'},{l:'Без чашолистка',k:q2,c:'#c47a00'},{l:'Прес-якість',k:q3,c:'#c0392b'}];
-  el('squal').innerHTML=tot>0?qi.map(function(q){
+  el('squal').innerHTML=fhtml+(tot>0?qi.map(function(q){
     var pct=Math.round(q.k/tot*100);
-    return'<div class="qbar"><div class="qbar-h"><span style="font-weight:700;color:#374151">'+q.l+'</span>'+
+    return'<div class="qbar"><div class="qbar-h">'+
+      '<span style="font-weight:700;color:#374151">'+q.l+'</span>'+
       '<span style="font-weight:900;color:'+q.c+'">'+q.k.toFixed(1)+' кг &nbsp;'+pct+'%</span></div>'+
       '<div class="qbar-bg"><div class="qbar-f" style="width:'+pct+'%;background:'+q.c+'"></div></div></div>';
-  }).join(''):'<div class="empty">Немає даних за сьогодні</div>';
+  }).join(''):'<div class="empty">Немає даних</div>');
+
+  // Вішаємо обробники на фільтр
+  var btnT=document.getElementById('sf-today');
+  var btnA=document.getElementById('sf-all');
+  if(btnT) btnT.addEventListener('click',function(){statsFil='today';renderS();});
+  if(btnA) btnA.addEventListener('click',function(){statsFil='all';renderS();});
+
+  // Працівники
   var wm={};
-  recs.forEach(function(r){if(!wm[r.name])wm[r.name]={name:r.name,tot:0,cnt:0};wm[r.name].tot+=r.qty;wm[r.name].cnt++;});
+  filtered.forEach(function(r){
+    if(!wm[r.name])wm[r.name]={name:r.name,tot:0,cnt:0,recs:[]};
+    wm[r.name].tot+=r.qty;wm[r.name].cnt++;wm[r.name].recs.push(r);
+  });
   var wa=Object.values(wm).sort(function(a,b){return b.tot-a.tot;});
   var mx=wa.length?wa[0].tot:1;
-  el('swork').innerHTML=wa.length?wa.map(function(w){
-    var ini=w.name.split(' ').map(function(p){return p[0]||'';}).join('').slice(0,2).toUpperCase();
-    var pct=Math.round(w.tot/mx*100);
-    return'<div class="wrow">'+
-      '<div class="wini">'+ini+'</div>'+
-      '<div style="flex:1;min-width:0"><div class="wnm">'+esc(w.name)+'</div>'+
-      '<div class="wbar-bg"><div class="wbar" style="width:'+pct+'%"></div></div></div>'+
-      '<div><div class="wkg">'+w.tot.toFixed(1)+'</div><div class="wcnt">'+w.cnt+' здач</div></div>'+
-    '</div>';
-  }).join(''):'<div class="empty">Немає даних</div>';
+
+  el('swork').innerHTML=wa.length?
+    '<div style="font-size:11px;color:#6b7280;margin-bottom:8px;font-weight:600">'+
+      (hasPrices?'Ціни: Зч='+prices.z+'₴ · Бч='+prices.b+'₴ · Пр='+prices.p+'₴':'⚙ Вкажіть ціни в Налаштуваннях')+
+    '</div>'+
+    wa.map(function(w){
+      var sal=calcSalary(w.recs,prices);
+      var pct=Math.round(w.tot/mx*100);
+      var ini=w.name.split(' ').map(function(p){return p[0]||'';}).join('').slice(0,2).toUpperCase();
+      return'<div class="wrow">'+
+        '<div class="wini">'+ini+'</div>'+
+        '<div style="flex:1;min-width:0">'+
+          '<div class="wnm">'+esc(w.name)+'</div>'+
+          '<div style="font-size:11px;color:#6b7280;margin-top:1px">'+w.tot+' кг · '+w.cnt+' здач</div>'+
+          '<div class="wbar-bg" style="margin-top:4px"><div class="wbar" style="width:'+pct+'%"></div></div>'+
+        '</div>'+
+        '<div style="text-align:right;min-width:75px">'+
+          '<div class="wkg">'+w.tot+'</div>'+
+          (hasPrices?'<div style="font-size:14px;font-weight:800;color:#1a8a4a;margin-top:2px">'+sal.toFixed(0)+' ₴</div>':'<div style="font-size:10px;color:#9ca3af;margin-top:2px">—</div>')+
+        '</div>'+
+      '</div>';
+    }).join(''):'<div class="empty">Немає даних</div>';
 }
 
 // ═══ SYNC ═══
@@ -799,6 +992,22 @@ window.addEventListener('offline',syncUI);
 setInterval(function(){if(navigator.onLine&&!busy)doSync();},30000);
 
 // ═══ SETTINGS ═══
+el('bsaveprices').addEventListener('click',function(){
+  var pz=parseFloat(el('p-zch').value)||0;
+  var pb=parseFloat(el('p-bch').value)||0;
+  var pp=parseFloat(el('p-prs').value)||0;
+  localStorage.setItem('pb_price_z',pz);
+  localStorage.setItem('pb_price_b',pb);
+  localStorage.setItem('pb_price_p',pp);
+  toast('✓ Ціни збережено: Зч='+pz+'₴ Бч='+pb+'₴ Пр='+pp+'₴');
+});
+
+function loadPriceInputs(){
+  el('p-zch').value=localStorage.getItem('pb_price_z')||0;
+  el('p-bch').value=localStorage.getItem('pb_price_b')||0;
+  el('p-prs').value=localStorage.getItem('pb_price_p')||0;
+}
+
 el('bsave').addEventListener('click',function(){
   var url=el('iurl').value.trim();
   if(!url.startsWith('https://')){toast('Невірний URL');return;}
@@ -864,7 +1073,7 @@ el('bdellog').addEventListener('click',function(){
 });
 
 // ═══ INIT ═══
-load();setQ(0);refreshWL();syncUI();checkReady();
+load();setQ(0);refreshWL();syncUI();checkReady();loadPriceInputs();
 </script>
 </body>
 </html>
