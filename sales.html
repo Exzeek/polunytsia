@@ -255,6 +255,40 @@ tbody tr:last-child td{border-bottom:none;}
 .ttime{font-size:22px;font-weight:900;color:var(--TX);}
 .tdate{font-size:13px;color:var(--TX2);margin-top:2px;}
 .tauto{font-size:10px;font-weight:700;background:#fff;border:1.5px solid var(--BD2);border-radius:20px;padding:4px 10px;color:var(--GR);}
+/* VARIETY SLIDER */
+.variety-slider-wrap{
+  overflow:hidden;border-radius:var(--RADS);
+  border:2.5px solid var(--B);margin-bottom:8px;
+  touch-action:pan-y;
+}
+.variety-track{
+  display:flex;
+  transition:transform .3s cubic-bezier(.4,0,.2,1);
+  will-change:transform;
+}
+.variety-opt{
+  flex:0 0 100%;padding:18px 14px;
+  display:flex;align-items:center;gap:14px;
+  background:#fff;cursor:pointer;
+  user-select:none;-webkit-user-select:none;
+}
+.variety-opt.active{background:var(--BL);}
+.var-ico{font-size:34px;flex-shrink:0;}
+.var-info{flex:1;}
+.var-name{font-size:22px;font-weight:900;color:var(--TX);display:block;}
+.var-sub{font-size:12px;color:var(--GR);margin-top:2px;display:block;}
+.variety-opt.active .var-name{color:var(--BD);}
+.variety-indicator{display:flex;justify-content:center;gap:8px;margin-bottom:8px;}
+.vi-dot{width:8px;height:8px;border-radius:50%;background:var(--BD2);transition:all .2s;}
+.vi-dot.active{background:var(--B);transform:scale(1.35);}
+.variety-selected{
+  text-align:center;font-size:15px;font-weight:700;
+  color:var(--BD);background:var(--BL);
+  border-radius:20px;padding:7px 16px;
+  border:2px solid var(--B);width:100%;
+}
+.swipe-hint{font-size:11px;color:var(--GR);text-align:center;margin-top:6px;}
+
 </style>
 </head>
 <body>
@@ -281,6 +315,33 @@ tbody tr:last-child td{border-bottom:none;}
       <input class="inp" type="text" id="new-client" placeholder="+ Новий покупець" autocorrect="off" autocapitalize="words">
       <button class="btn-add" id="btn-add-client">Додати</button>
     </div>
+  </div>
+
+  <!-- Сорт ягоди -->
+  <div class="card">
+    <div class="ctit">Сорт полуниці</div>
+    <div class="variety-slider-wrap">
+      <div class="variety-track" id="variety-track">
+        <div class="variety-opt active" data-var="Хоней">
+          <span class="var-ico">🍓</span>
+          <span class="var-name">Хоней</span>
+        </div>
+        <div class="variety-opt" data-var="Румба">
+          <span class="var-ico">🍓</span>
+          <span class="var-name">Румба</span>
+        </div>
+        <div class="variety-opt" data-var="Верді">
+          <span class="var-ico">🍓</span>
+          <span class="var-name">Верді</span>
+        </div>
+      </div>
+    </div>
+    <div class="variety-indicator">
+      <div class="vi-dot active" data-vi="0"></div>
+      <div class="vi-dot" data-vi="1"></div>
+      <div class="vi-dot" data-vi="2"></div>
+    </div>
+    <div class="variety-selected" id="variety-display">🍓 Хоней</div>
   </div>
 
   <!-- Якість -->
@@ -325,13 +386,13 @@ tbody tr:last-child td{border-bottom:none;}
       </div>
       <button class="qpm" id="pplus" style="border-color:var(--A);background:var(--AL);color:var(--A)">+</button>
     </div>
-    <div class="presets" style="margin-top:8px">
-      <button class="pre" data-p="10" style="border-color:var(--A);background:var(--AL);color:var(--A)">10 ₴</button>
-      <button class="pre" data-p="12" style="border-color:var(--A);background:var(--AL);color:var(--A)">12 ₴</button>
-      <button class="pre" data-p="15" style="border-color:var(--A);background:var(--AL);color:var(--A)">15 ₴</button>
-      <button class="pre" data-p="18" style="border-color:var(--A);background:var(--AL);color:var(--A)">18 ₴</button>
-      <button class="pre" data-p="20" style="border-color:var(--A);background:var(--AL);color:var(--A)">20 ₴</button>
-      <button class="pre" data-p="25" style="border-color:var(--A);background:var(--AL);color:var(--A)">25 ₴</button>
+    <div class="presets" style="margin-top:8px;grid-template-columns:repeat(3,1fr)">
+      <button class="pre" data-p="150" style="border-color:var(--A);background:var(--AL);color:var(--A)">150 ₴</button>
+      <button class="pre" data-p="160" style="border-color:var(--A);background:var(--AL);color:var(--A)">160 ₴</button>
+      <button class="pre" data-p="170" style="border-color:var(--A);background:var(--AL);color:var(--A)">170 ₴</button>
+      <button class="pre" data-p="180" style="border-color:var(--A);background:var(--AL);color:var(--A)">180 ₴</button>
+      <button class="pre" data-p="190" style="border-color:var(--A);background:var(--AL);color:var(--A)">190 ₴</button>
+      <button class="pre" data-p="200" style="border-color:var(--A);background:var(--AL);color:var(--A)">200 ₴</button>
     </div>
     <div class="total-box" id="total-box">
       <span class="total-label">Сума угоди</span>
@@ -371,7 +432,7 @@ tbody tr:last-child td{border-bottom:none;}
   <div class="tscr">
     <table>
       <thead><tr>
-        <th>Покупець</th><th>Кг</th><th>Якість</th><th>Ціна</th><th>Сума</th><th>Час</th><th>Синх.</th><th></th>
+        <th>Покупець</th><th>Сорт</th><th>Кг</th><th>Якість</th><th>Ціна</th><th>Сума</th><th>Час</th><th>Синх.</th><th></th>
       </tr></thead>
       <tbody id="jtb"></tbody>
     </table>
@@ -471,10 +532,18 @@ var qty=0;
 var price=0;
 var selQ=0;
 var selClient='';
+var selVariety='Хоней';
+var varIdx=0;
 var jFil='today';
 var syncing=false;
 var syncT=null;
 var pendingDelId=null;
+
+var VARIETIES=[
+  {name:'Хоней', sub:'Класичний солодкий сорт'},
+  {name:'Румба',  sub:'Ранній великоплідний сорт'},
+  {name:'Верді',  sub:'Пізній зимостійкий сорт'},
+];
 
 // ═══ HELPERS ═══
 function el(id){return document.getElementById(id);}
@@ -484,11 +553,19 @@ function getURL(){return localStorage.getItem(UK)||'';}
 
 function nowObj(){
   var d=new Date();
+  var offset=3;
+  var kyiv=new Date(d.getTime()+offset*3600*1000-d.getTimezoneOffset()*60*1000);
+  var yr=kyiv.getUTCFullYear();
+  var mo=p2(kyiv.getUTCMonth()+1);
+  var dy=p2(kyiv.getUTCDate());
+  var hr=p2(kyiv.getUTCHours());
+  var mi=p2(kyiv.getUTCMinutes());
+  var sc=p2(kyiv.getUTCSeconds());
   return{
-    time:p2(d.getHours())+':'+p2(d.getMinutes())+':'+p2(d.getSeconds()),
-    date:p2(d.getDate())+'.'+p2(d.getMonth()+1)+'.'+d.getFullYear(),
-    iso:d.getFullYear()+'-'+p2(d.getMonth()+1)+'-'+p2(d.getDate()),
-    ts:d.getFullYear()+'-'+p2(d.getMonth()+1)+'-'+p2(d.getDate())+' '+p2(d.getHours())+':'+p2(d.getMinutes())+':'+p2(d.getSeconds())
+    time:hr+':'+mi+':'+sc,
+    date:dy+'.'+mo+'.'+yr,
+    iso:yr+'-'+mo+'-'+dy,
+    ts:yr+'-'+mo+'-'+dy+' '+hr+':'+mi+':'+sc
   };
 }
 
@@ -568,7 +645,66 @@ el('btn-add-client').addEventListener('click',function(){
   toast('✓ Додано: '+v);
 });
 
-// ═══ QUALITY ═══
+// ═══ VARIETY SLIDER ═══
+var track=el('variety-track');
+var touchStartX=0, touchStartY=0, isDragging=false;
+
+function goVariety(idx){
+  varIdx=Math.max(0,Math.min(VARIETIES.length-1,idx));
+  selVariety=VARIETIES[varIdx].name;
+  track.style.transform='translateX(-'+varIdx*100+'%)';
+  document.querySelectorAll('.variety-opt').forEach(function(o,i){
+    o.classList.toggle('active',i===varIdx);
+  });
+  document.querySelectorAll('.vi-dot').forEach(function(d,i){
+    d.classList.toggle('active',i===varIdx);
+  });
+  el('variety-display').textContent='🍓 '+selVariety;
+}
+
+// Свайп
+track.addEventListener('touchstart',function(e){
+  touchStartX=e.touches[0].clientX;
+  touchStartY=e.touches[0].clientY;
+  isDragging=true;
+},{passive:true});
+
+track.addEventListener('touchend',function(e){
+  if(!isDragging)return;
+  var dx=e.changedTouches[0].clientX-touchStartX;
+  var dy=e.changedTouches[0].clientY-touchStartY;
+  if(Math.abs(dx)>Math.abs(dy)&&Math.abs(dx)>40){
+    goVariety(varIdx+(dx<0?1:-1));
+  }
+  isDragging=false;
+},{passive:true});
+
+// Кліки на точки
+document.querySelectorAll('.vi-dot').forEach(function(d){
+  d.addEventListener('click',function(){goVariety(parseInt(d.dataset.vi));});
+});
+
+// Кліки на опції
+document.querySelectorAll('.variety-opt').forEach(function(o,i){
+  o.addEventListener('click',function(){goVariety(i);});
+});
+
+// Заповнюємо підзаголовки
+document.querySelectorAll('.variety-opt').forEach(function(o,i){
+  if(!o.querySelector('.var-info')){
+    var name=o.querySelector('.var-name');
+    var wrap=document.createElement('div');
+    wrap.className='var-info';
+    var sub=document.createElement('span');
+    sub.className='var-sub';
+    sub.textContent=VARIETIES[i].sub;
+    o.insertBefore(wrap,name);
+    wrap.appendChild(name);
+    wrap.appendChild(sub);
+  }
+});
+
+goVariety(0); // ініціалізація
 document.querySelectorAll('.qopt').forEach(function(b){
   b.addEventListener('click',function(){
     selQ=parseInt(b.dataset.q);
@@ -604,14 +740,14 @@ function setPrice(v){
   el('price-val').textContent=price.toFixed(2);
   updateTotal();checkReady();
 }
-el('pminus').addEventListener('click',function(){setPrice(price-1);});
-el('pplus').addEventListener('click',function(){setPrice(price+1);});
+el('pminus').addEventListener('click',function(){setPrice(price-10);});
+el('pplus').addEventListener('click',function(){setPrice(price+10);});
 document.querySelectorAll('.pre[data-p]').forEach(function(b){
   b.addEventListener('click',function(){setPrice(parseFloat(b.dataset.p));});
 });
 var pPressT;
-el('pminus').addEventListener('touchstart',function(e){e.preventDefault();setPrice(price-1);pPressT=setInterval(function(){setPrice(price-1);},160);},{passive:false});
-el('pplus').addEventListener('touchstart',function(e){e.preventDefault();setPrice(price+1);pPressT=setInterval(function(){setPrice(price+1);},160);},{passive:false});
+el('pminus').addEventListener('touchstart',function(e){e.preventDefault();setPrice(price-10);pPressT=setInterval(function(){setPrice(price-10);},160);},{passive:false});
+el('pplus').addEventListener('touchstart',function(e){e.preventDefault();setPrice(price+10);pPressT=setInterval(function(){setPrice(price+10);},160);},{passive:false});
 el('pminus').addEventListener('touchend',function(){clearInterval(pPressT);});
 el('pplus').addEventListener('touchend',function(){clearInterval(pPressT);});
 
@@ -639,13 +775,14 @@ el('bsubmit').addEventListener('click',function(){
   var rec={
     id:'s_'+Date.now()+'_'+Math.random().toString(36).slice(2,5),
     client:selClient,qty:qty,qualityLabel:QL[selQ],quality:selQ,
+    variety:selVariety,
     price:price,total:total,
     note:el('note').value.trim(),
     time:n.time,date:n.date,iso:n.iso,ts:n.ts,
     synced:false
   };
   sales.push(rec);save();
-  toast('✓ '+selClient+' — '+qty+' кг — '+total.toFixed(2)+' ₴');
+  toast('✓ '+selClient+' — '+selVariety+' — '+qty+' кг — '+total.toFixed(2)+' ₴');
 
   // Вібрація
   if(navigator.vibrate) navigator.vibrate(60);
@@ -690,6 +827,7 @@ function renderJ(){
   tb.innerHTML=data.map(function(r){
     return'<tr>'+
       '<td style="font-weight:700;max-width:70px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+esc(r.client)+'</td>'+
+      '<td><span class="badge bb">'+(r.variety||'—')+'</span></td>'+
       '<td style="font-weight:900">'+r.qty+'</td>'+
       '<td><span class="badge '+qb[r.quality]+'">'+['','З чашол.','Без чашол.','Прес'][r.quality]+'</span></td>'+
       '<td style="font-weight:700;color:#b45309">'+r.price.toFixed(2)+'</td>'+
@@ -867,9 +1005,9 @@ function doCSV(){
   var data=getFil();
   if(!data.length){toast('Немає даних');return;}
   var rows=data.map(function(r){
-    return'"'+r.client+'",'+r.qty+',"'+r.qualityLabel+'",'+r.price+','+r.total+',"'+r.ts+'","'+r.note+'"';
+    return'"'+r.client+'","'+(r.variety||'')+'",'+r.qty+',"'+r.qualityLabel+'",'+r.price+','+r.total+',"'+r.ts+'","'+r.note+'"';
   });
-  var csv='\ufeff'+'Покупець,Кг,Якість,Ціна,Сума,Дата і час,Нотатка\n'+rows.join('\n');
+  var csv='\ufeff'+'Покупець,Сорт,Кг,Якість,Ціна,Сума,Дата і час,Нотатка\n'+rows.join('\n');
   var a=document.createElement('a');
   a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8'}));
   a.download='sales_'+nowObj().iso+'.csv';
