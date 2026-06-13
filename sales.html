@@ -289,6 +289,24 @@ tbody tr:last-child td{border-bottom:none;}
 }
 .swipe-hint{font-size:11px;color:var(--GR);text-align:center;margin-top:6px;}
 
+/* VARIETY BIG BUTTONS */
+.var-big{
+  padding:16px 8px;border:2.5px solid var(--BD2);border-radius:var(--RADS);
+  background:#fff;text-align:center;cursor:pointer;touch-action:manipulation;
+  transition:all .15s;
+}
+.var-big:active{transform:scale(.96);}
+.var-big.on{border-color:var(--G);background:var(--GL);box-shadow:0 0 0 3px rgba(26,138,74,.18);}
+
+/* PAYMENT TYPE */
+.pay-btn{
+  padding:16px 8px;border:2.5px solid var(--BD2);border-radius:var(--RADS);
+  background:#fff;text-align:center;cursor:pointer;touch-action:manipulation;
+  transition:all .15s;
+}
+.pay-btn:active{transform:scale(.96);}
+.pay-btn.on{border-color:var(--B);background:var(--BL);box-shadow:0 0 0 3px rgba(21,101,192,.18);}
+
 </style>
 </head>
 <body>
@@ -317,31 +335,26 @@ tbody tr:last-child td{border-bottom:none;}
     </div>
   </div>
 
-  <!-- Сорт ягоди -->
+  <!-- Сорт ягоди — великі кнопки -->
   <div class="card">
     <div class="ctit">Сорт полуниці</div>
-    <div class="variety-slider-wrap">
-      <div class="variety-track" id="variety-track">
-        <div class="variety-opt active" data-var="Хоней">
-          <span class="var-ico">🍓</span>
-          <span class="var-name">Хоней</span>
-        </div>
-        <div class="variety-opt" data-var="Румба">
-          <span class="var-ico">🍓</span>
-          <span class="var-name">Румба</span>
-        </div>
-        <div class="variety-opt" data-var="Верді">
-          <span class="var-ico">🍓</span>
-          <span class="var-name">Верді</span>
-        </div>
-      </div>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px">
+      <button class="var-big on" data-var="Хоней" type="button">
+        <span style="font-size:26px">🍓</span>
+        <span style="font-size:15px;font-weight:800;display:block;margin-top:4px">Хоней</span>
+        <span style="font-size:10px;color:#6b7280;display:block;margin-top:2px">Солодкий</span>
+      </button>
+      <button class="var-big" data-var="Румба" type="button">
+        <span style="font-size:26px">🍓</span>
+        <span style="font-size:15px;font-weight:800;display:block;margin-top:4px">Румба</span>
+        <span style="font-size:10px;color:#6b7280;display:block;margin-top:2px">Ранній</span>
+      </button>
+      <button class="var-big" data-var="Верді" type="button">
+        <span style="font-size:26px">🍓</span>
+        <span style="font-size:15px;font-weight:800;display:block;margin-top:4px">Верді</span>
+        <span style="font-size:10px;color:#6b7280;display:block;margin-top:2px">Пізній</span>
+      </button>
     </div>
-    <div class="variety-indicator">
-      <div class="vi-dot active" data-vi="0"></div>
-      <div class="vi-dot" data-vi="1"></div>
-      <div class="vi-dot" data-vi="2"></div>
-    </div>
-    <div class="variety-selected" id="variety-display">🍓 Хоней</div>
   </div>
 
   <!-- Якість -->
@@ -354,24 +367,40 @@ tbody tr:last-child td{border-bottom:none;}
     </div>
   </div>
 
+  <!-- Тип оплати -->
+  <div class="card">
+    <div class="ctit">Тип оплати</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+      <button class="pay-btn on" id="pay-cash" type="button">
+        <span style="font-size:24px">💵</span>
+        <span style="display:block;font-size:15px;font-weight:800;margin-top:4px">Готівка</span>
+      </button>
+      <button class="pay-btn" id="pay-card" type="button">
+        <span style="font-size:24px">💳</span>
+        <span style="display:block;font-size:15px;font-weight:800;margin-top:4px">Безготівка</span>
+      </button>
+    </div>
+  </div>
+
   <!-- Кількість -->
   <div class="card">
     <div class="ctit">Кількість (кг)</div>
     <div class="qty-row">
       <button class="qpm" id="bminus">−</button>
-      <div class="qnum">
-        <span id="qnum-kg">0 кг</span>
-        <span class="qnum-sub" id="qnum-sub">оберіть кількість</span>
+      <div class="qnum" style="cursor:text;flex-direction:column;gap:2px" onclick="el('qty-inp').focus()">
+        <input id="qty-inp" type="number" min="0" step="0.5" inputmode="decimal"
+          style="width:100%;text-align:center;font-size:26px;font-weight:900;border:none;background:transparent;color:var(--TX);outline:none;padding:0">
+        <span class="qnum-sub" id="qnum-sub">кг</span>
       </div>
       <button class="qpm" id="bplus">+</button>
     </div>
     <div class="presets">
-      <button class="pre" data-v="5">5 кг</button>
-      <button class="pre" data-v="10">10 кг</button>
-      <button class="pre" data-v="25">25 кг</button>
-      <button class="pre" data-v="50">50 кг</button>
-      <button class="pre" data-v="100">100 кг</button>
-      <button class="pre" data-v="200">200 кг</button>
+      <button class="pre" data-v="5">5</button>
+      <button class="pre" data-v="10">10</button>
+      <button class="pre" data-v="25">25</button>
+      <button class="pre" data-v="50">50</button>
+      <button class="pre" data-v="100">100</button>
+      <button class="pre" data-v="200">200</button>
     </div>
   </div>
 
@@ -380,19 +409,22 @@ tbody tr:last-child td{border-bottom:none;}
     <div class="ctit">Ціна продажу (грн/кг)</div>
     <div class="price-row">
       <button class="qpm" id="pminus" style="border-color:var(--A);background:var(--AL);color:var(--A)">−</button>
-      <div style="flex:1">
-        <div class="price-val" id="price-val">0.00</div>
+      <div style="flex:1;cursor:text" onclick="el('price-inp').focus()">
+        <input id="price-inp" type="number" min="0" step="5" inputmode="decimal"
+          style="width:100%;text-align:center;font-size:22px;font-weight:900;color:var(--A);border:none;background:var(--AL);outline:none;padding:8px 0;border-radius:var(--RADS)">
         <div class="price-label">грн за кг</div>
       </div>
       <button class="qpm" id="pplus" style="border-color:var(--A);background:var(--AL);color:var(--A)">+</button>
     </div>
-    <div class="presets" style="margin-top:8px;grid-template-columns:repeat(3,1fr)">
-      <button class="pre" data-p="150" style="border-color:var(--A);background:var(--AL);color:var(--A)">150 ₴</button>
-      <button class="pre" data-p="160" style="border-color:var(--A);background:var(--AL);color:var(--A)">160 ₴</button>
-      <button class="pre" data-p="170" style="border-color:var(--A);background:var(--AL);color:var(--A)">170 ₴</button>
-      <button class="pre" data-p="180" style="border-color:var(--A);background:var(--AL);color:var(--A)">180 ₴</button>
-      <button class="pre" data-p="190" style="border-color:var(--A);background:var(--AL);color:var(--A)">190 ₴</button>
-      <button class="pre" data-p="200" style="border-color:var(--A);background:var(--AL);color:var(--A)">200 ₴</button>
+    <div class="presets" style="margin-top:8px;grid-template-columns:repeat(4,1fr)">
+      <button class="pre" data-p="150" style="border-color:var(--A);background:var(--AL);color:var(--A)">150</button>
+      <button class="pre" data-p="160" style="border-color:var(--A);background:var(--AL);color:var(--A)">160</button>
+      <button class="pre" data-p="170" style="border-color:var(--A);background:var(--AL);color:var(--A)">170</button>
+      <button class="pre" data-p="180" style="border-color:var(--A);background:var(--AL);color:var(--A)">180</button>
+      <button class="pre" data-p="190" style="border-color:var(--A);background:var(--AL);color:var(--A)">190</button>
+      <button class="pre" data-p="200" style="border-color:var(--A);background:var(--AL);color:var(--A)">200</button>
+      <button class="pre" data-p="210" style="border-color:var(--A);background:var(--AL);color:var(--A)">210</button>
+      <button class="pre" data-p="220" style="border-color:var(--A);background:var(--AL);color:var(--A)">220</button>
     </div>
     <div class="total-box" id="total-box">
       <span class="total-label">Сума угоди</span>
@@ -432,7 +464,7 @@ tbody tr:last-child td{border-bottom:none;}
   <div class="tscr">
     <table>
       <thead><tr>
-        <th>Покупець</th><th>Сорт</th><th>Кг</th><th>Якість</th><th>Ціна</th><th>Сума</th><th>Час</th><th>Синх.</th><th></th>
+        <th>Покупець</th><th>Сорт</th><th>Кг</th><th>Якість</th><th>Ціна</th><th>Сума</th><th>Оплата</th><th>Час</th><th>Синх.</th><th></th>
       </tr></thead>
       <tbody id="jtb"></tbody>
     </table>
@@ -704,7 +736,29 @@ document.querySelectorAll('.variety-opt').forEach(function(o,i){
   }
 });
 
-goVariety(0); // ініціалізація
+// ═══ VARIETY — великі кнопки ═══
+var selVariety='Хоней';
+document.querySelectorAll('.var-big').forEach(function(b){
+  b.addEventListener('click',function(){
+    selVariety=b.dataset.var;
+    document.querySelectorAll('.var-big').forEach(function(x){x.classList.remove('on');});
+    b.classList.add('on');
+  });
+});
+
+// ═══ PAYMENT TYPE ═══
+var selPayment='Готівка';
+el('pay-cash').addEventListener('click',function(){
+  selPayment='Готівка';
+  el('pay-cash').classList.add('on');
+  el('pay-card').classList.remove('on');
+});
+el('pay-card').addEventListener('click',function(){
+  selPayment='Безготівка';
+  el('pay-card').classList.add('on');
+  el('pay-cash').classList.remove('on');
+});
+
 document.querySelectorAll('.qopt').forEach(function(b){
   b.addEventListener('click',function(){
     selQ=parseInt(b.dataset.q);
@@ -714,14 +768,17 @@ document.querySelectorAll('.qopt').forEach(function(b){
   });
 });
 
-// ═══ QTY ═══
+// ═══ QTY з ручним вводом ═══
 var pressT;
 function setQty(v){
-  qty=Math.max(0,Math.round(v));
-  el('qnum-kg').textContent=qty+' кг';
-  el('qnum-sub').textContent=qty>0?(qty/1000).toFixed(0)+' т' : 'оберіть кількість';
+  qty=Math.max(0,Math.round(v*10)/10);
+  el('qty-inp').value=qty||'';
   updateTotal();checkReady();
 }
+el('qty-inp').addEventListener('input',function(){
+  qty=Math.max(0,parseFloat(el('qty-inp').value)||0);
+  updateTotal();checkReady();
+});
 el('bminus').addEventListener('click',function(){setQty(qty-5);});
 el('bplus').addEventListener('click',function(){setQty(qty+5);});
 function startH(dir){pressT=setInterval(function(){setQty(qty+dir*5);},160);}
@@ -731,30 +788,37 @@ el('bplus').addEventListener('touchstart',function(e){e.preventDefault();setQty(
 el('bminus').addEventListener('touchend',stopH);el('bplus').addEventListener('touchend',stopH);
 el('bminus').addEventListener('touchcancel',stopH);el('bplus').addEventListener('touchcancel',stopH);
 document.querySelectorAll('.pre[data-v]').forEach(function(b){
-  b.addEventListener('click',function(){setQty(parseInt(b.dataset.v));});
+  b.addEventListener('click',function(){setQty(parseFloat(b.dataset.v));});
 });
 
-// ═══ PRICE ═══
+// ═══ PRICE з ручним вводом, крок 5 ═══
 function setPrice(v){
   price=Math.max(0,Math.round(v*100)/100);
-  el('price-val').textContent=price.toFixed(2);
+  el('price-inp').value=price||'';
   updateTotal();checkReady();
 }
-el('pminus').addEventListener('click',function(){setPrice(price-10);});
-el('pplus').addEventListener('click',function(){setPrice(price+10);});
+el('price-inp').addEventListener('input',function(){
+  price=Math.max(0,parseFloat(el('price-inp').value)||0);
+  updateTotal();checkReady();
+});
+var pPressT;
+el('pminus').addEventListener('click',function(){setPrice(price-5);});
+el('pplus').addEventListener('click',function(){setPrice(price+5);});
+el('pminus').addEventListener('touchstart',function(e){e.preventDefault();setPrice(price-5);pPressT=setInterval(function(){setPrice(price-5);},160);},{passive:false});
+el('pplus').addEventListener('touchstart',function(e){e.preventDefault();setPrice(price+5);pPressT=setInterval(function(){setPrice(price+5);},160);},{passive:false});
+el('pminus').addEventListener('touchend',function(){clearInterval(pPressT);});
+el('pplus').addEventListener('touchend',function(){clearInterval(pPressT);});
+el('pminus').addEventListener('touchcancel',function(){clearInterval(pPressT);});
+el('pplus').addEventListener('touchcancel',function(){clearInterval(pPressT);});
 document.querySelectorAll('.pre[data-p]').forEach(function(b){
   b.addEventListener('click',function(){setPrice(parseFloat(b.dataset.p));});
 });
-var pPressT;
-el('pminus').addEventListener('touchstart',function(e){e.preventDefault();setPrice(price-10);pPressT=setInterval(function(){setPrice(price-10);},160);},{passive:false});
-el('pplus').addEventListener('touchstart',function(e){e.preventDefault();setPrice(price+10);pPressT=setInterval(function(){setPrice(price+10);},160);},{passive:false});
-el('pminus').addEventListener('touchend',function(){clearInterval(pPressT);});
-el('pplus').addEventListener('touchend',function(){clearInterval(pPressT);});
 
 function updateTotal(){
-  var total=qty>0&&price>0?qty*price:0;
+  var total=qty>0&&price>0?Math.round(qty*price*100)/100:0;
   el('total-val').textContent=total.toFixed(2)+' ₴';
 }
+
 
 // ═══ CHECK READY ═══
 function checkReady(){
@@ -775,14 +839,14 @@ el('bsubmit').addEventListener('click',function(){
   var rec={
     id:'s_'+Date.now()+'_'+Math.random().toString(36).slice(2,5),
     client:selClient,qty:qty,qualityLabel:QL[selQ],quality:selQ,
-    variety:selVariety,
+    variety:selVariety,payment:selPayment,
     price:price,total:total,
     note:el('note').value.trim(),
     time:n.time,date:n.date,iso:n.iso,ts:n.ts,
     synced:false
   };
   sales.push(rec);save();
-  toast('✓ '+selClient+' — '+selVariety+' — '+qty+' кг — '+total.toFixed(2)+' ₴');
+  toast('✓ '+selClient+' — '+selVariety+' — '+qty+' кг — '+total.toFixed(0)+' ₴ ('+selPayment+')');
 
   // Вібрація
   if(navigator.vibrate) navigator.vibrate(60);
@@ -830,8 +894,9 @@ function renderJ(){
       '<td><span class="badge bb">'+(r.variety||'—')+'</span></td>'+
       '<td style="font-weight:900">'+r.qty+'</td>'+
       '<td><span class="badge '+qb[r.quality]+'">'+['','З чашол.','Без чашол.','Прес'][r.quality]+'</span></td>'+
-      '<td style="font-weight:700;color:#b45309">'+r.price.toFixed(2)+'</td>'+
-      '<td style="font-weight:900;color:#15803d">'+r.total.toFixed(2)+'</td>'+
+      '<td style="font-weight:700;color:#b45309">'+r.price.toFixed(0)+'</td>'+
+      '<td style="font-weight:900;color:#15803d">'+r.total.toFixed(0)+'</td>'+
+      '<td><span class="badge '+(r.payment==='Готівка'?'bg':'bb')+'">'+(r.payment==='Готівка'?'💵':'💳')+'</span></td>'+
       '<td style="font-size:11px;color:#6b7280;white-space:nowrap">'+r.time+'<br>'+r.date+'</td>'+
       '<td><span class="badge '+(r.synced?'bg':'bgr')+'">'+(r.synced?'✓':'...')+'</span></td>'+
       '<td><button class="dbtn" data-id="'+r.id+'">🗑</button></td>'+
@@ -1005,9 +1070,9 @@ function doCSV(){
   var data=getFil();
   if(!data.length){toast('Немає даних');return;}
   var rows=data.map(function(r){
-    return'"'+r.client+'","'+(r.variety||'')+'",'+r.qty+',"'+r.qualityLabel+'",'+r.price+','+r.total+',"'+r.ts+'","'+r.note+'"';
+    return'"'+r.client+'","'+(r.variety||'')+'",'+r.qty+',"'+r.qualityLabel+'",'+r.price+','+r.total+',"'+(r.payment||'')+'","'+r.ts+'","'+r.note+'"';
   });
-  var csv='\ufeff'+'Покупець,Сорт,Кг,Якість,Ціна,Сума,Дата і час,Нотатка\n'+rows.join('\n');
+  var csv='\ufeff'+'Покупець,Сорт,Кг,Якість,Ціна,Сума,Оплата,Дата і час,Нотатка\n'+rows.join('\n');
   var a=document.createElement('a');
   a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8'}));
   a.download='sales_'+nowObj().iso+'.csv';
@@ -1017,9 +1082,11 @@ function doCSV(){
 
 // ═══ INIT ═══
 load();
-setQty(0);setPrice(0);
+qty=0; price=0;
+if(el('qty-inp')) el('qty-inp').value='';
+if(el('price-inp')) el('price-inp').value='';
 renderClients();
-syncUI();checkReady();
+syncUI(); checkReady();
 </script>
 </body>
 </html>
