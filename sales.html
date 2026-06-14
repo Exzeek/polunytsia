@@ -276,10 +276,33 @@ tbody tr:last-child td{border-bottom:none;}
   </div>
 
   <div class="card">
-    <div class="ctit">Час і дата</div>
-    <div class="tbox">
-      <div><div class="ttime" id="ttime">—</div><div class="tdate" id="tdate">—</div></div>
-      <div class="tauto">Авто</div>
+    <div class="ctit">Дата і час продажу</div>
+    <div class="tbox" id="tbox-auto" style="margin-bottom:10px">
+      <div>
+        <div class="ttime" id="ttime">—</div>
+        <div class="tdate" id="tdate">—</div>
+      </div>
+      <button class="tauto" id="btn-manual-date" type="button" style="cursor:pointer;border:none;background:#fff;border:1.5px solid var(--BD2);padding:6px 12px;border-radius:20px;font-size:11px;font-weight:700;color:var(--GR)">
+        ✏️ Змінити дату
+      </button>
+    </div>
+    <!-- Ручний вибір дати — прихований за замовчуванням -->
+    <div id="manual-date-block" style="display:none">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px">
+        <div>
+          <label style="font-size:11px;font-weight:700;color:var(--GR);display:block;margin-bottom:4px">📅 Дата</label>
+          <input type="date" id="sel-date"
+            style="width:100%;padding:12px;font-size:16px;border:2px solid var(--B);border-radius:var(--RADS);background:#fff;color:var(--TX);outline:none;-webkit-appearance:none">
+        </div>
+        <div>
+          <label style="font-size:11px;font-weight:700;color:var(--GR);display:block;margin-bottom:4px">⏰ Час</label>
+          <input type="time" id="sel-time"
+            style="width:100%;padding:12px;font-size:16px;border:2px solid var(--B);border-radius:var(--RADS);background:#fff;color:var(--TX);outline:none;-webkit-appearance:none">
+        </div>
+      </div>
+      <button class="bact bprim" id="btn-use-auto" type="button" style="margin-bottom:0;font-size:13px;padding:10px">
+        🔄 Повернутись до автоматичного часу
+      </button>
     </div>
   </div>
 
@@ -376,6 +399,7 @@ var sales=[], clients=['Ринок','Переробка','Оптовик'];
 var qty=0, price=0, selQ=0;
 var selClient='', selVar='Хоней', selPay='Готівка';
 var jFil='today', delId=null, syncing=false, syncT=null;
+var useManualDate=false; // чи використовується ручна дата
 var SK='pb_sales_v1', CK='pb_clients_v1', UK='pb3_url';
 var QL={1:'З чашолистком',2:'Без чашолистка',3:'Прес-якість'};
 var CI=['🏪','🏬','🚛','🧑‍🌾','🏭','💼','🛒','🍓'];
@@ -394,6 +418,19 @@ function toast(m){
 
 function p2(n){return ('0'+n).slice(-2);}
 function nowObj(){
+  if (useManualDate) {
+    // Беремо вручну вибрану дату
+    var dateVal = g('sel-date').value; // yyyy-MM-dd
+    var timeVal = g('sel-time').value; // HH:mm
+    if (dateVal && timeVal) {
+      var p=dateVal.split('-');
+      var iso=dateVal;
+      var date=p[2]+'.'+p[1]+'.'+p[0];
+      var ts=dateVal+' '+timeVal+':00';
+      return{time:timeVal+':00',date:date,iso:iso,ts:ts};
+    }
+  }
+  // Авто — київський час
   var d=new Date();
   var off=3;
   var k=new Date(d.getTime()+off*3600000-d.getTimezoneOffset()*60000);
@@ -401,6 +438,26 @@ function nowObj(){
   var hr=p2(k.getUTCHours()),mi=p2(k.getUTCMinutes()),sc=p2(k.getUTCSeconds());
   return{time:hr+':'+mi+':'+sc,date:dy+'.'+mo+'.'+yr,iso:yr+'-'+mo+'-'+dy,ts:yr+'-'+mo+'-'+dy+' '+hr+':'+mi+':'+sc};
 }
+
+// ── ВИБІР ДАТИ ВРУЧНУ ────────────────────────────────────────
+function setManualDateDefaults() {
+  var n=nowObj();
+  g('sel-date').value=n.iso;
+  g('sel-time').value=n.time.substring(0,5); // HH:mm
+}
+
+g('btn-manual-date').addEventListener('click',function(){
+  useManualDate=true;
+  setManualDateDefaults();
+  g('tbox-auto').style.display='none';
+  g('manual-date-block').style.display='block';
+});
+
+g('btn-use-auto').addEventListener('click',function(){
+  useManualDate=false;
+  g('tbox-auto').style.display='';
+  g('manual-date-block').style.display='none';
+});
 
 function save(){try{localStorage.setItem(SK,JSON.stringify(sales));}catch(e){}syncUI();}
 function saveC(){try{localStorage.setItem(CK,JSON.stringify(clients));}catch(e){}}
@@ -416,6 +473,7 @@ function addLog(m){
 
 // ── ГОДИННИК ─────────────────────────────────────────────────
 function tick(){
+  if (useManualDate) return; // не перезаписуємо якщо ручна дата
   var n=nowObj();
   g('ttime').textContent=n.time;
   g('tdate').textContent=n.date;
@@ -571,6 +629,10 @@ g('bsubmit').addEventListener('click',function(){
   g('qty-inp').value='';g('price-inp').value='';g('note').value='';
   g('total-val').textContent='0 ₴';
   document.querySelectorAll('.qopt').forEach(function(b){b.className='qopt';});
+  // Повертаємо авто-час після запису
+  useManualDate=false;
+  g('tbox-auto').style.display='';
+  g('manual-date-block').style.display='none';
   checkReady();sched();
 });
 
