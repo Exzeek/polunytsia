@@ -747,9 +747,56 @@ function renderStats(){
 // ── СИНХРОНІЗАЦІЯ ────────────────────────────────────────────
 function sched(){clearTimeout(syncT);syncT=setTimeout(doSync,2000);}
 function schedDel(id){
-  var url=getURL();if(!url||!navigator.onLine)return;
-  fetch(url,{method:'POST',body:JSON.stringify({action:'delete_sale',id:id}),headers:{'Content-Type':'text/plain'}}).catch(function(){});
+  var url=getURL();
+  if(!url||!navigator.onLine){
+    // Зберігаємо в чергу на видалення
+    var q=JSON.parse(localStorage.getItem('pb_del_queue')||'[]');
+    q.push(id);
+    localStorage.setItem('pb_del_queue',JSON.stringify(q));
+    addLog('Видалення '+id+' — в черзі');
+    return;
+  }
+  addLog('Видаляємо з таблиці: '+id);
+  fetch(url,{
+    method:'POST',
+    body:JSON.stringify({action:'delete_sale',id:id}),
+    headers:{'Content-Type':'text/plain'}
+  })
+  .then(function(r){return r.text();})
+  .then(function(t){
+    try{var d=JSON.parse(t);addLog(d.success?'✓ Видалено з таблиці':'Помилка: '+(d.error||'?'));}
+    catch(e){addLog('Надіслано (no-cors OK)');}
+  })
+  .catch(function(){
+    // Fallback no-cors
+    fetch(url,{method:'POST',mode:'no-cors',
+      body:JSON.stringify({action:'delete_sale',id:id}),
+      headers:{'Content-Type':'text/plain'}
+    })
+    .then(function(){addLog('✓ Видалення надіслано');})
+    .catch(function(e){
+      addLog('Помилка видалення: '+e.message);
+      var q=JSON.parse(localStorage.getItem('pb_del_queue')||'[]');
+      q.push(id);localStorage.setItem('pb_del_queue',JSON.stringify(q));
+    });
+  });
 }
+
+// Обробка черги видалень при наступному онлайн
+window.addEventListener('online',function(){
+  syncUI();sched();
+  var q=JSON.parse(localStorage.getItem('pb_del_queue')||'[]');
+  if(!q.length)return;
+  var url=getURL();if(!url)return;
+  q.forEach(function(id){
+    fetch(url,{method:'POST',mode:'no-cors',
+      body:JSON.stringify({action:'delete_sale',id:id}),
+      headers:{'Content-Type':'text/plain'}
+    }).catch(function(){});
+  });
+  localStorage.removeItem('pb_del_queue');
+  addLog('Черга видалень надіслана: '+q.length);
+});
 function doSync(){
   var url=getURL();if(!url||syncing||!navigator.onLine)return;
   var pend=sales.filter(function(r){return!r.synced;});if(!pend.length)return;
