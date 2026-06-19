@@ -353,15 +353,16 @@ tbody tr:last-child td{border-bottom:none;}
     <div class="qrow">
       <button class="qpm" id="bminus3" type="button" style="font-size:16px;font-weight:800;width:68px">−3</button>
       <button class="qpm" id="bminus1" type="button" style="font-size:16px;font-weight:800">−1</button>
-      <div class="qnum" id="qnum" style="flex-direction:column;gap:0">
-        <span id="qnum-kg">0</span>
+      <div class="qnum" id="qnum" style="flex-direction:column;gap:2px;cursor:text" onclick="el('qty-manual').focus()">
+        <input id="qty-manual" type="number" min="0" step="0.5" inputmode="decimal"
+          style="width:100%;text-align:center;font-size:26px;font-weight:900;border:none;background:transparent;color:var(--TX);outline:none;padding:0;font-family:inherit">
         <span id="qnum-lub" style="font-size:12px;font-weight:600;color:var(--GR)">0 Л</span>
       </div>
       <button class="qpm" id="bplus1" type="button" style="font-size:16px;font-weight:800">+1</button>
       <button class="qpm" id="bplus3" type="button" style="font-size:16px;font-weight:800;width:68px">+3</button>
     </div>
     <div style="text-align:center;font-size:11px;color:var(--GR);margin-top:6px;margin-bottom:8px;font-weight:600;">
-      утримуйте кнопку для швидкого набору
+      утримуйте кнопку для швидкого набору · або введіть вручну
     </div>
     <div class="presets" style="grid-template-columns:repeat(3,1fr)">
       <button class="pre" data-v="3">3 кг<br><span style="font-size:11px;font-weight:700;color:var(--G)">1 Л</span></button>
@@ -418,12 +419,31 @@ tbody tr:last-child td{border-bottom:none;}
 
   <div class="card">
     <div class="ctit">Час і дата збору</div>
-    <div class="tbox">
+    <div class="tbox" id="tbox-auto" style="margin-bottom:10px">
       <div>
         <div class="ttime" id="ttime">—</div>
         <div class="tdate" id="tdate">—</div>
       </div>
-      <div class="tauto">Авто</div>
+      <button class="tauto" id="btn-manual-date" type="button" style="cursor:pointer;border:1.5px solid var(--BD2);background:#fff;padding:6px 12px;border-radius:20px;font-size:11px;font-weight:700;color:var(--GR)">
+        ✏️ Змінити дату
+      </button>
+    </div>
+    <div id="manual-date-block" style="display:none">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px">
+        <div>
+          <label style="font-size:11px;font-weight:700;color:var(--GR);display:block;margin-bottom:4px">📅 Дата</label>
+          <input type="date" id="sel-date"
+            style="width:100%;padding:12px;font-size:16px;border:2px solid var(--G);border-radius:var(--RADS);background:#fff;color:var(--TX);outline:none;-webkit-appearance:none">
+        </div>
+        <div>
+          <label style="font-size:11px;font-weight:700;color:var(--GR);display:block;margin-bottom:4px">⏰ Час</label>
+          <input type="time" id="sel-time"
+            style="width:100%;padding:12px;font-size:16px;border:2px solid var(--G);border-radius:var(--RADS);background:#fff;color:var(--TX);outline:none;-webkit-appearance:none">
+        </div>
+      </div>
+      <button class="bact bprim" id="btn-use-auto" type="button" style="margin-bottom:0;font-size:13px;padding:10px">
+        🔄 Повернутись до автоматичного часу
+      </button>
     </div>
   </div>
 
@@ -564,13 +584,29 @@ function getURL(){return localStorage.getItem(UK)||'';}
 
 // ═══ CLOCK ═══
 function p2(n){return('0'+n).slice(-2);}
+var useManualDate=false;
+
 function tick(){
+  if (useManualDate) return; // не перезаписуємо якщо ручна дата
   var d=new Date();
   var t=p2(d.getHours())+':'+p2(d.getMinutes())+':'+p2(d.getSeconds());
   var dt=p2(d.getDate())+'.'+p2(d.getMonth()+1)+'.'+d.getFullYear();
   el('ttime').textContent=t;el('tdate').textContent=dt;el('hdate').textContent=dt;
 }
 function nowObj(){
+  if (useManualDate) {
+    var dateVal=el('sel-date').value; // yyyy-MM-dd
+    var timeVal=el('sel-time').value; // HH:mm
+    if (dateVal && timeVal) {
+      var p=dateVal.split('-');
+      return{
+        time:timeVal+':00',
+        date:p[2]+'.'+p[1]+'.'+p[0],
+        iso:dateVal,
+        ts:dateVal+' '+timeVal+':00'
+      };
+    }
+  }
   var d=new Date();
   // Використовуємо локальний час телефону для відображення
   // але зберігаємо timestamp сумісний з ID (мілісекунди UTC → київський час)
@@ -591,6 +627,24 @@ function nowObj(){
 }
 setInterval(tick,1000);tick();
 
+// ═══ ВИБІР ДАТИ ВРУЧНУ ═══
+function setManualDateDefaults(){
+  var n=nowObj();
+  el('sel-date').value=n.iso;
+  el('sel-time').value=n.time.substring(0,5);
+}
+el('btn-manual-date').addEventListener('click',function(){
+  useManualDate=true;
+  setManualDateDefaults();
+  el('tbox-auto').style.display='none';
+  el('manual-date-block').style.display='block';
+});
+el('btn-use-auto').addEventListener('click',function(){
+  useManualDate=false;
+  el('tbox-auto').style.display='';
+  el('manual-date-block').style.display='none';
+});
+
 // ═══ HELPERS ═══
 function el(id){return document.getElementById(id);}
 function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
@@ -607,13 +661,23 @@ function log(m){
 
 // ═══ QTY ═══
 function setQ(v){
-  qty=Math.max(0,Math.round(v));
-  el('qnum-kg').textContent=qty+' кг';
+  qty=Math.max(0,Math.round(v*10)/10);
+  var inp=el('qty-manual');
+  if(inp) inp.value=qty||'';
   var lub=Math.floor(qty/3);
-  var rem=qty%3;
+  var rem=Math.round((qty%3)*10)/10;
   el('qnum-lub').textContent=(rem>0?(lub>0?lub+'+'+rem:rem):lub)+' Л';
   checkReady();
 }
+// Ручний ввід кількості
+el('qty-manual').addEventListener('input',function(){
+  var v=parseFloat(el('qty-manual').value)||0;
+  qty=Math.max(0,Math.round(v*100)/100);
+  var lub=Math.floor(qty/3);
+  var rem=Math.round((qty%3)*10)/10;
+  el('qnum-lub').textContent=(rem>0?(lub>0?lub+'+'+rem:rem):lub)+' Л';
+  checkReady();
+});
 el('bminus3').addEventListener('click',function(){setQ(qty-3);});
 el('bminus1').addEventListener('click',function(){setQ(qty-1);});
 el('bplus1').addEventListener('click',function(){setQ(qty+1);});
@@ -629,7 +693,7 @@ function stopHold(){clearInterval(pressT);}
   el(id).addEventListener('touchcancel',stopHold);
 });
 document.querySelectorAll('.pre').forEach(function(b){
-  b.addEventListener('click',function(){setQ(parseInt(b.dataset.v));});
+  b.addEventListener('click',function(){setQ(parseFloat(b.dataset.v));});
 });
 
 // ═══ VARIETY ═══
@@ -700,16 +764,24 @@ el('bsubmit').addEventListener('click',function(){
   if(qty<=0){toast('⚠ Вкажіть кількість кг');return;}
   if(!selQ){toast('⚠ Оберіть якість');return;}
   var n=nowObj();
-  var r={id:Date.now()+'_'+Math.random().toString(36).slice(2,5),
+  // Якщо обрана ручна дата — формуємо ID на основі цієї дати/часу,
+  // щоб fixFromId() в Apps Script відновлював саме правильну дату
+  var idMs = useManualDate ? new Date(n.ts.replace(' ','T')+'+03:00').getTime() : Date.now();
+  if (isNaN(idMs)) idMs = Date.now();
+  var r={id:idMs+'_'+Math.random().toString(36).slice(2,5),
     name:name,qty:qty,quality:selQ,qualityLabel:QL[selQ],
     variety:selVar,
     time:n.time,date:n.date,iso:n.iso,ts:n.ts,synced:false};
   recs.push(r);save();
-  toast('✓ '+name+' — '+selVar+' — '+qty+' кг');
+  toast('✓ '+name+' — '+selVar+' — '+qty+' кг'+(useManualDate?' ('+n.date+')':''));
   // Скидаємо форму — ім'я теж очищаємо
   el('nm').value='';
   setQ(0);selQ=0;
   document.querySelectorAll('.qopt').forEach(function(b){b.className='qopt';});
+  // Повертаємось до авто-часу після запису
+  useManualDate=false;
+  el('tbox-auto').style.display='';
+  el('manual-date-block').style.display='none';
   checkReady();
   sched();
 });
@@ -817,12 +889,21 @@ el('del-confirm').addEventListener('click',function(){
 // Надсилаємо ID на видалення в Google Sheets
 function scheduleDelete(id){
   var url=getURL();
-  if(!url||!navigator.onLine)return;
-  fetch(url,{
-    method:'POST',
-    body:JSON.stringify({action:'delete',id:id}),
-    headers:{'Content-Type':'text/plain'}
-  }).catch(function(){});
+  if(!url||!navigator.onLine){
+    var q=JSON.parse(localStorage.getItem('pb_del_harvest_queue')||'[]');
+    q.push(id);localStorage.setItem('pb_del_harvest_queue',JSON.stringify(q));
+    return;
+  }
+  fetch(url,{method:'POST',body:JSON.stringify({action:'delete',id:id}),headers:{'Content-Type':'text/plain'}})
+  .then(function(r){return r.text();})
+  .then(function(t){try{var d=JSON.parse(t);addLog(d.success?'✓ Видалено':'Помилка: '+(d.error||'?'));}catch(e){}}  )
+  .catch(function(){
+    fetch(url,{method:'POST',mode:'no-cors',body:JSON.stringify({action:'delete',id:id}),headers:{'Content-Type':'text/plain'}})
+    .catch(function(e){
+      var q=JSON.parse(localStorage.getItem('pb_del_harvest_queue')||'[]');
+      q.push(id);localStorage.setItem('pb_del_harvest_queue',JSON.stringify(q));
+    });
+  });
 }
 
 // ═══ STATS ═══
@@ -987,7 +1068,19 @@ function syncUI(){
   else{dot.className='sdot ok';lbl.textContent='Синхронізовано';}
 }
 
-window.addEventListener('online',function(){syncUI();sched();});
+window.addEventListener('online',function(){
+  syncUI();sched();
+  // Обробка черги видалень
+  var q=JSON.parse(localStorage.getItem('pb_del_harvest_queue')||'[]');
+  if(q.length){
+    var url=getURL();if(url){
+      q.forEach(function(id){
+        fetch(url,{method:'POST',mode:'no-cors',body:JSON.stringify({action:'delete',id:id}),headers:{'Content-Type':'text/plain'}}).catch(function(){});
+      });
+      localStorage.removeItem('pb_del_harvest_queue');
+    }
+  }
+});
 window.addEventListener('offline',syncUI);
 setInterval(function(){if(navigator.onLine&&!busy)doSync();},30000);
 
