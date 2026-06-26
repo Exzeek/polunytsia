@@ -615,15 +615,19 @@ g('bsubmit').addEventListener('click',function(){
   if(price<=0){toast('⚠ Вкажіть ціну');return;}
   var n=nowObj();
   var total=Math.round(qty*price*100)/100;
+  // Якщо обрана ручна дата — формуємо ID на основі цієї дати/часу,
+  // щоб дата в таблиці відповідала вибраній, а не моменту натискання
+  var idMs = useManualDate ? new Date(n.ts.replace(' ','T')+'+03:00').getTime() : Date.now();
+  if (isNaN(idMs)) idMs = Date.now();
   var rec={
-    id:'s_'+Date.now()+'_'+Math.random().toString(36).slice(2,5),
+    id:'s_'+idMs+'_'+Math.random().toString(36).slice(2,5),
     client:selClient,variety:selVar,quality:selQ,qualityLabel:QL[selQ],
     payment:selPay,qty:qty,price:price,total:total,
     note:g('note').value.trim(),
     time:n.time,date:n.date,iso:n.iso,ts:n.ts,synced:false
   };
   sales.push(rec);save();
-  toast('✓ '+selClient+' '+selVar+' '+qty+'кг → '+total.toFixed(0)+'₴');
+  toast('✓ '+selClient+' '+selVar+' '+qty+'кг → '+total.toFixed(0)+'₴'+(useManualDate?' ('+n.date+')':''));
   if(navigator.vibrate)navigator.vibrate(60);
   qty=0;price=0;selQ=0;
   g('qty-inp').value='';g('price-inp').value='';g('note').value='';
